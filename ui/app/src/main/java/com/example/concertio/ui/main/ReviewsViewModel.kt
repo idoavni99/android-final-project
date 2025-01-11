@@ -17,23 +17,44 @@ class ReviewsViewModel : ViewModel() {
     private val repository = ReviewsRepository()
     private val uiState = MutableLiveData(UiState())
 
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.loadReviewsFromRemoteSource(50, 0)
+        }
+    }
+
     fun getUiStateObserver(): LiveData<UiState> {
         return this.uiState
     }
 
     fun deleteReviewByUid(uid: String, onDeletedUi: () -> Unit = {}) {
         viewModelScope.launch(Dispatchers.Main) {
-            repository.deleteStudentByUid(uid)
+            repository.deleteReviewByUid(uid)
             onDeletedUi()
         }
     }
 
     fun getAllReviews(): LiveData<List<ReviewWithReviewer>> {
-        return this.repository.getStudentsList()
+        return this.repository.getReviewsList(50, 0, viewModelScope)
+    }
+
+    fun invalidateReviews() {
+        viewModelScope.launch {
+            repository.loadReviewsFromRemoteSource(50, 0)
+        }
+    }
+
+    fun invalidateReviewByUid() {
+        viewModelScope.launch {
+            val uid = uiState.value?.reviewUid ?: return@launch
+            if (uid.isNotEmpty()) {
+                repository.loadReviewFromRemoteSource(uid)
+            }
+        }
     }
 
     fun getReviewByUid(uid: String = ""): LiveData<ReviewWithReviewer?> {
-        return this.repository.getStudentByUid(uid)
+        return this.repository.getReviewByUid(uid, viewModelScope)
     }
 
     fun saveReview(
@@ -45,8 +66,8 @@ class ReviewsViewModel : ViewModel() {
             viewModelScope.launch(Dispatchers.Main) {
                 if (it.success) {
                     when (uiState.value?.detailsMode) {
-                        SaveReviewMode.ADD -> repository.addStudent(student)
-                        SaveReviewMode.EDIT -> repository.editStudent(student)
+                        SaveReviewMode.ADD -> repository.addReview(student)
+                        SaveReviewMode.EDIT -> repository.editReview(student)
                         else -> {}
                     }
                     onCompleteUi()

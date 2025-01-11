@@ -11,7 +11,10 @@ import androidx.room.Upsert
 @Dao
 interface UsersDao {
     @Query("SELECT * FROM users WHERE uid LIKE :uid LIMIT 1")
-    fun getUserByUid(uid: String): LiveData<UserModel>
+    suspend fun getUserByUid(uid: String): UserModel?
+
+    @Query("SELECT uid FROM users WHERE uid IN (:uids)")
+    suspend fun getExistingUserIds(uids: List<String>): List<String>
 
     @Insert
     fun insertAll(vararg users: UserModel)

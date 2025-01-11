@@ -56,6 +56,8 @@ class SaveReviewFragment : Fragment() {
             locationTextView?.setText(location)
             reviewText?.setText(review)
             this@SaveReviewFragment.reviewerUid = reviewerUid
+        } ?: {
+            viewModel.invalidateReviewByUid()
         }
     }
 

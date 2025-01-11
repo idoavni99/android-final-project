@@ -36,6 +36,7 @@ class ReviewsListFragment : Fragment() {
         reviewsList = view.findViewById(R.id.students_list)
         context?.let { initStudentsList(it) }
         viewModel.getAllReviews().observe(viewLifecycleOwner, {
+            if(it.isEmpty()) viewModel.invalidateReviews()
             (reviewsList.adapter as? ReviewsAdapter)?.updateReviews(it)
         })
         viewModel.getUiStateObserver().observe(viewLifecycleOwner, {

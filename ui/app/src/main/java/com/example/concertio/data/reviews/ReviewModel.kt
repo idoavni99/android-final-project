@@ -32,6 +32,16 @@ data class ReviewModel(
             return ValidationResult(e)
         }
     }
+
+    fun toRemoteSource(): RemoteSourceReview {
+        return RemoteSourceReview(
+            artist = artist,
+            location_name = location,
+            review = review,
+            reviewer_uid = reviewerUid,
+            uid = uid
+        )
+    }
 }
 
 

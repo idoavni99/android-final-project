@@ -9,11 +9,8 @@ import androidx.room.Update
 
 @Dao
 interface ReviewsDao {
-    @Query("SELECT * FROM reviews")
-    fun getAll(): LiveData<List<ReviewWithReviewer>>
-
-    @Query("SELECT * FROM reviews WHERE uid IN (:reviewIds)")
-    fun loadAllByIds(reviewIds: IntArray): LiveData<List<ReviewWithReviewer>>
+    @Query("SELECT * FROM reviews LIMIT :limit OFFSET :offset")
+    fun getAllPaginated(limit: Int, offset: Int): LiveData<List<ReviewWithReviewer>>
 
     @Query("SELECT * FROM reviews WHERE uid LIKE :uid LIMIT 1")
     fun findByUid(uid: String): LiveData<ReviewWithReviewer?>
