@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/app_navigation"
+    app:startDestination="@id/studentsListFragment">
+
+    <fragment
+        android:id="@+id/studentsListFragment"
+        android:name="com.example.concertio.ui.main.fragments.studentslist.StudentsListFragment"
+        android:label="Students List"
+        tools:layout="@layout/fragment_students_list">
+        <action
+            android:id="@+id/action_studentsListFragment_to_studentDetailsFragment"
+            app:destination="@id/studentDetailsFragment" />
+        <action
+            android:id="@+id/action_studentsListFragment_to_saveStudentFragment"
+            app:destination="@id/saveStudentFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/studentDetailsFragment"
+        android:name="com.example.concertio.ui.main.fragments.studentdetails.StudentDetailsFragment"
+        android:label="Student Details"
+        tools:layout="@layout/fragment_student_details">
+        <action
+            android:id="@+id/action_studentDetailsFragment_to_studentsListFragment"
+            app:destination="@id/studentsListFragment" />
+        <action
+            android:id="@+id/action_studentDetailsFragment_to_saveStudentFragment"
+            app:destination="@id/saveStudentFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/saveStudentFragment"
+        android:name="com.example.concertio.ui.main.fragments.savestudent.SaveStudentFragment"
+        tools:layout="@layout/fragment_save_student">
+        <action
+            android:id="@+id/action_saveStudentFragment_to_studentsListFragment"
+            app:destination="@id/studentsListFragment"
+            app:popUpTo="@id/app_navigation"
+            app:popUpToInclusive="true" />
+    </fragment>
+</navigation>
