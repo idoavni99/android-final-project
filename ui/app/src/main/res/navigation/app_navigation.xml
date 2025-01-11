@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/reviewsListFragment"
-        android:name="com.example.concertio.ui.main.fragments.studentslist.ReviewsListFragment"
+        android:name="com.example.concertio.ui.main.fragments.reviews_list.ReviewsListFragment"
         android:label="Reviews List"
         tools:layout="@layout/fragment_reviews_list">
         <action
@@ -19,7 +19,7 @@
     </fragment>
     <fragment
         android:id="@+id/reviewDetailsFragment"
-        android:name="com.example.concertio.ui.main.fragments.studentdetails.ReviewDetailsFragment"
+        android:name="com.example.concertio.ui.main.fragments.review_details.ReviewDetailsFragment"
         android:label="Review Details"
         tools:layout="@layout/fragment_review_details">
         <action
@@ -31,7 +31,7 @@
     </fragment>
     <fragment
         android:id="@+id/saveReviewFragment"
-        android:name="com.example.concertio.ui.main.fragments.savestudent.SaveReviewFragment"
+        android:name="com.example.concertio.ui.main.fragments.save_review.SaveReviewFragment"
         tools:layout="@layout/fragment_save_review">
         <action
             android:id="@+id/action_saveReviewFragment_to_reviewsListFragment"

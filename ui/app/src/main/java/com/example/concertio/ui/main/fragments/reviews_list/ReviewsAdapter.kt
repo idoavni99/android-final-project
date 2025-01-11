@@ -1,4 +1,4 @@
-package com.example.concertio.ui.main.fragments.studentslist
+package com.example.concertio.ui.main.fragments.reviews_list
 
 import android.view.LayoutInflater
 import android.view.View

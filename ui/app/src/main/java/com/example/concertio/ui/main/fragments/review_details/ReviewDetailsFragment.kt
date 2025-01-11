@@ -1,4 +1,4 @@
-package com.example.concertio.ui.main.fragments.studentdetails
+package com.example.concertio.ui.main.fragments.review_details
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -13,7 +13,7 @@ import androidx.navigation.findNavController
 import com.example.concertio.R
 import com.example.concertio.ui.main.ReviewsViewModel
 import com.example.concertio.ui.main.UiState
-import com.example.concertio.ui.main.fragments.savestudent.SaveReviewMode
+import com.example.concertio.ui.main.fragments.save_review.SaveReviewMode
 import com.example.concertio.data.reviews.ReviewWithReviewer
 
 class ReviewDetailsFragment : Fragment() {
@@ -34,7 +34,7 @@ class ReviewDetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         viewModel.getUiStateObserver().observe(viewLifecycleOwner) { uiState ->
             setupToolbar(view, uiState)
-            viewModel.getReviewByUid(uiState.reviewUid)
+            viewModel.getReviewById(uiState.reviewId)
                 .observe(viewLifecycleOwner, ::setupTextFields)
         }
         super.onViewCreated(view, savedInstanceState)
@@ -55,7 +55,7 @@ class ReviewDetailsFragment : Fragment() {
                 isVisible = true
             }
             setOnMenuItemClickListener {
-                viewModel.toSaveReview(uiState.reviewUid, SaveReviewMode.EDIT)
+                viewModel.toSaveReview(uiState.reviewId, SaveReviewMode.EDIT)
                 view.findNavController()
                     .navigate(ReviewDetailsFragmentDirections.actionReviewDetailsFragmentToSaveReviewFragment())
                 true

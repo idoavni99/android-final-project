@@ -10,11 +10,11 @@ data class RemoteSourceReview(
     val reviewer_uid: String? = null,
     val media_id: String? = null,
     val media_type: String? = null,
-    val uid: String? = null
+    val id: String? = null
 ) {
     fun toReviewModel(): ReviewModel {
         return ReviewModel(
-            uid=uid ?: "",
+            id=id ?: "",
             artist = artist,
             location = location_name,
             review = review ?: "",

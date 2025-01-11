@@ -1,6 +1,5 @@
 package com.example.concertio.data.users
 
-import androidx.lifecycle.LiveData
 import com.example.concertio.room.DatabaseHolder
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -14,19 +13,19 @@ class UsersRepository {
 
     suspend fun insertUsers(vararg users: UserModel) = withContext(Dispatchers.IO) {
         firestoreHandle.add(users).await()
-        usersDao.insertAll(*users)
+        usersDao.upsertAll(*users)
     }
 
     suspend fun upsertUser(user: UserModel) = withContext(Dispatchers.IO) {
-        firestoreHandle.document(user.uid).set(user).await()
-        usersDao.upsert(user)
+        firestoreHandle.document(user.uid).set(user.toRemoteSourceUser()).await()
+        usersDao.upsertAll(user)
     }
 
     suspend fun deleteAllUsers() = withContext(Dispatchers.IO) {
         usersDao.deleteAll()
     }
 
-    suspend fun deleteByUid(uid: String) = withContext(Dispatchers.IO) {
+    suspend fun deleteById(uid: String) = withContext(Dispatchers.IO) {
         usersDao.deleteByUid(uid)
     }
 
@@ -52,9 +51,11 @@ class UsersRepository {
 
     private suspend fun getUserFromRemoteSource(uid: String): UserModel? =
         withContext(Dispatchers.IO) {
-            val user = firestoreHandle.document(uid).get().await().toObject(UserModel::class.java)
+            val user =
+                firestoreHandle.document(uid).get().await().toObject(RemoteSourceUser::class.java)
+                    ?.toUserModel()
             if (user != null) {
-                usersDao.upsert(user)
+                usersDao.upsertAll(user)
             }
             return@withContext user
         }
@@ -63,9 +64,10 @@ class UsersRepository {
         withContext(Dispatchers.IO) {
             val usersQuery =
                 if (uids.isNotEmpty()) firestoreHandle.whereIn("uid", uids) else firestoreHandle
-            val users = usersQuery.get().await().toObjects(UserModel::class.java)
+            val users = usersQuery.get().await().toObjects(RemoteSourceUser::class.java)
+                .map { it.toUserModel() }
             if (users.isNotEmpty()) {
-                usersDao.insertAll(*users.toTypedArray())
+                usersDao.upsertAll(*users.toTypedArray())
             }
             return@withContext users
         }

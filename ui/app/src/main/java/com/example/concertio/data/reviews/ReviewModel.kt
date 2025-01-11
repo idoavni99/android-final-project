@@ -18,7 +18,7 @@ import java.util.UUID
     )]
 )
 data class ReviewModel(
-    @PrimaryKey val uid: String = UUID.randomUUID().toString(),
+    @PrimaryKey val id: String = UUID.randomUUID().toString(),
     @ColumnInfo(name = "location") val location: String? = null,
     @ColumnInfo(name = "reviewer_uid") val reviewerUid: String,
     @ColumnInfo(name = "artist") val artist: String? = null,
@@ -39,7 +39,7 @@ data class ReviewModel(
             location_name = location,
             review = review,
             reviewer_uid = reviewerUid,
-            uid = uid
+            id = id
         )
     }
 }

@@ -6,10 +6,18 @@ import com.google.firebase.auth.FirebaseAuth
 
 @Entity(tableName = "users")
 data class UserModel(
-    @PrimaryKey() val uid: String,
+    @PrimaryKey val uid: String = "",
     val name: String,
     val email: String?,
 ) {
+    fun toRemoteSourceUser(): RemoteSourceUser {
+        return RemoteSourceUser(
+            uid = uid,
+            name = name,
+            email = email
+        )
+    }
+
     companion object {
         fun fromFirebaseAuth(): UserModel {
             val user = FirebaseAuth.getInstance().currentUser

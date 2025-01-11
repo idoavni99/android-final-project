@@ -1,4 +1,4 @@
-package com.example.concertio.ui.main.fragments.savestudent
+package com.example.concertio.ui.main.fragments.save_review
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -44,7 +44,7 @@ class SaveReviewFragment : Fragment() {
         viewModel.getUiStateObserver().observe(viewLifecycleOwner) { uiState ->
             setupToolbar(uiState)
             setupActions(view, uiState)
-            viewModel.getReviewByUid(uiState.reviewUid)
+            viewModel.getReviewById(uiState.reviewId)
                 .observe(viewLifecycleOwner, ::setupInputFields)
         }
         super.onViewCreated(view, savedInstanceState)
@@ -57,7 +57,7 @@ class SaveReviewFragment : Fragment() {
             reviewText?.setText(review)
             this@SaveReviewFragment.reviewerUid = reviewerUid
         } ?: {
-            viewModel.invalidateReviewByUid()
+            viewModel.invalidateReviewById()
         }
     }
 
@@ -86,7 +86,8 @@ class SaveReviewFragment : Fragment() {
         }
 
         deleteButton?.setOnClickListener {
-            viewModel.deleteReviewByUid(uiState.reviewUid) {
+            viewModel.deleteReviewById(uiState.reviewId) {
+                viewModel.toReviewsList()
                 nav.navigate(SaveReviewFragmentDirections.actionSaveReviewFragmentToReviewsListFragment())
             }
         }

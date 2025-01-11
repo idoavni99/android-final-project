@@ -18,25 +18,25 @@ class ReviewsRepository() {
     suspend fun addReview(vararg reviews: ReviewModel) = withContext(Dispatchers.IO) {
         val batchHandle = Firebase.firestore.batch()
         reviews.forEach {
-            batchHandle.set(firestoreHandle.document(it.uid), it.toRemoteSource())
+            batchHandle.set(firestoreHandle.document(it.id), it.toRemoteSource())
         }
         batchHandle.commit().await()
 
-        reviewsDao.insertAll(*reviews)
+        reviewsDao.upsertAll(*reviews)
     }
 
     suspend fun editReview(review: ReviewModel) = withContext(Dispatchers.IO) {
-        firestoreHandle.document(review.uid).set(review.toRemoteSource()).await()
+        firestoreHandle.document(review.id).set(review.toRemoteSource()).await()
         reviewsDao.update(review)
     }
 
-    suspend fun deleteReviewByUid(uid: String) = withContext(Dispatchers.IO) {
-        firestoreHandle.document(uid).delete().await()
-        reviewsDao.deleteByUid(uid)
+    suspend fun deleteReviewById(id: String) = withContext(Dispatchers.IO) {
+        firestoreHandle.document(id).delete().await()
+        reviewsDao.deleteById(id)
     }
 
-    fun getReviewByUid(uid: String, scope: CoroutineScope): LiveData<ReviewWithReviewer?> {
-        return reviewsDao.findByUid(uid)
+    fun getReviewById(id: String): LiveData<ReviewWithReviewer?> {
+        return reviewsDao.findById(id)
     }
 
     fun getReviewsList(
@@ -48,15 +48,15 @@ class ReviewsRepository() {
     }
 
 
-    suspend fun loadReviewFromRemoteSource(uid: String) = withContext(Dispatchers.IO) {
+    suspend fun loadReviewFromRemoteSource(id: String) = withContext(Dispatchers.IO) {
         val review =
-            firestoreHandle.document(uid).get().await().toObject(RemoteSourceReview::class.java)
+            firestoreHandle.document(id).get().await().toObject(RemoteSourceReview::class.java)
                 ?.toReviewModel()
         if (review != null) {
-            reviewsDao.insertAll(review)
+            reviewsDao.upsertAll(review)
             usersRepository.cacheUserIfNotExisting(review.reviewerUid)
         }
-        return@withContext reviewsDao.findByUid(uid)
+        return@withContext reviewsDao.findById(id)
     }
 
     suspend fun loadReviewsFromRemoteSource(limit: Int, offset: Int) =
@@ -64,7 +64,7 @@ class ReviewsRepository() {
             val reviews = firestoreHandle.orderBy("review").startAt(offset).limit(limit.toLong())
                 .get().await().toObjects(RemoteSourceReview::class.java).map { it.toReviewModel() }
             if (reviews.isNotEmpty()) {
-                reviewsDao.insertAll(*reviews.toTypedArray())
+                reviewsDao.upsertAll(*reviews.toTypedArray())
                 usersRepository.cacheUsersIfNotExisting(reviews.map { it.reviewerUid })
             }
         }

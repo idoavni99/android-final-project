@@ -16,8 +16,8 @@ interface UsersDao {
     @Query("SELECT uid FROM users WHERE uid IN (:uids)")
     suspend fun getExistingUserIds(uids: List<String>): List<String>
 
-    @Insert
-    fun insertAll(vararg users: UserModel)
+    @Upsert
+    fun upsertAll(vararg users: UserModel)
 
     @Query("DELETE FROM users")
     fun deleteAll()
@@ -27,7 +27,4 @@ interface UsersDao {
 
     @Update
     fun updateUserData(user: UserModel)
-
-    @Upsert
-    fun upsert(user: UserModel)
 }

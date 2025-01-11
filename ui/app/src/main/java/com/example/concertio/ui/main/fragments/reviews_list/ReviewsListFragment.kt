@@ -1,4 +1,4 @@
-package com.example.concertio.ui.main.fragments.studentslist
+package com.example.concertio.ui.main.fragments.reviews_list
 
 import android.content.Context
 import android.os.Bundle
@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.concertio.R
 import com.example.concertio.ui.main.ReviewsViewModel
-import com.example.concertio.ui.main.fragments.savestudent.SaveReviewMode
+import com.example.concertio.ui.main.fragments.save_review.SaveReviewMode
 
 
 class ReviewsListFragment : Fragment() {
