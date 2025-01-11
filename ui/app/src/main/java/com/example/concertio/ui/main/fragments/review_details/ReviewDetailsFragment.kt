@@ -12,7 +12,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
 import com.example.concertio.R
 import com.example.concertio.ui.main.ReviewsViewModel
-import com.example.concertio.ui.main.UiState
+import com.example.concertio.ui.main.ReviewsUiState
 import com.example.concertio.ui.main.fragments.save_review.SaveReviewMode
 import com.example.concertio.data.reviews.ReviewWithReviewer
 
@@ -32,11 +32,12 @@ class ReviewDetailsFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        viewModel.getUiStateObserver().observe(viewLifecycleOwner) { uiState ->
+        viewModel.observeUiState().observe(viewLifecycleOwner) { uiState ->
             setupToolbar(view, uiState)
-            viewModel.getReviewById(uiState.reviewId)
-                .observe(viewLifecycleOwner, ::setupTextFields)
         }
+
+        viewModel.getReviewById()
+            .observe(viewLifecycleOwner, ::setupTextFields)
         super.onViewCreated(view, savedInstanceState)
     }
 
@@ -48,14 +49,14 @@ class ReviewDetailsFragment : Fragment() {
         }
     }
 
-    private fun setupToolbar(view: View, uiState: UiState) {
+    private fun setupToolbar(view: View, reviewsUiState: ReviewsUiState) {
         toolbar?.apply {
             menu[0].apply {
                 title = "Edit"
                 isVisible = true
             }
             setOnMenuItemClickListener {
-                viewModel.toSaveReview(uiState.reviewId, SaveReviewMode.EDIT)
+                viewModel.toSaveReview(reviewsUiState.reviewId, SaveReviewMode.EDIT)
                 view.findNavController()
                     .navigate(ReviewDetailsFragmentDirections.actionReviewDetailsFragmentToSaveReviewFragment())
                 true

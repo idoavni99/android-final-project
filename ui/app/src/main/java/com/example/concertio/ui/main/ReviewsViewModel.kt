@@ -11,25 +11,25 @@ import com.example.concertio.data.reviews.ReviewsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-data class UiState(val reviewId: String = "", val detailsMode: SaveReviewMode? = null)
+data class ReviewsUiState(val reviewId: String = "", val detailsMode: SaveReviewMode? = null)
 
 class ReviewsViewModel : ViewModel() {
     private val repository = ReviewsRepository()
-    private val uiState = MutableLiveData(UiState())
-
+    private var reviewsUiState = ReviewsUiState()
+    private val uiStateObserver = MutableLiveData(reviewsUiState)
     init {
         viewModelScope.launch(Dispatchers.IO) {
             repository.loadReviewsFromRemoteSource(50, 0)
         }
     }
 
-    fun getUiStateObserver(): LiveData<UiState> {
-        return this.uiState
+    fun observeUiState(): LiveData<ReviewsUiState> {
+        return this.uiStateObserver
     }
 
-    fun deleteReviewById(id: String, onDeletedUi: () -> Unit = {}) {
+    fun deleteReviewByCurrentId(onDeletedUi: () -> Unit = {}) {
         viewModelScope.launch(Dispatchers.Main) {
-            repository.deleteReviewById(id)
+            repository.deleteReviewById(reviewsUiState.reviewId)
             onDeletedUi()
         }
     }
@@ -46,15 +46,14 @@ class ReviewsViewModel : ViewModel() {
 
     fun invalidateReviewById() {
         viewModelScope.launch {
-            val uid = uiState.value?.reviewId ?: return@launch
-            if (uid.isNotEmpty()) {
-                repository.loadReviewFromRemoteSource(uid)
+            if (reviewsUiState.reviewId.isNotEmpty()) {
+                repository.loadReviewFromRemoteSource(reviewsUiState.reviewId)
             }
         }
     }
 
-    fun getReviewById(id: String = ""): LiveData<ReviewWithReviewer?> {
-        return this.repository.getReviewById(id)
+    fun getReviewById(): LiveData<ReviewWithReviewer?> {
+        return this.repository.getReviewById(reviewsUiState.reviewId)
     }
 
     fun saveReview(
@@ -65,7 +64,7 @@ class ReviewsViewModel : ViewModel() {
         review.validate().let {
             viewModelScope.launch(Dispatchers.Main) {
                 if (it.success) {
-                    when (uiState.value?.detailsMode) {
+                    when (reviewsUiState.detailsMode) {
                         SaveReviewMode.ADD -> repository.addReview(review)
                         SaveReviewMode.EDIT -> repository.editReview(review)
                         else -> {}
@@ -79,18 +78,19 @@ class ReviewsViewModel : ViewModel() {
     }
 
     fun toReviewDetails(id: String) {
-        this.updateUiState(UiState(reviewId = id))
+        this.updateUiState(ReviewsUiState(reviewId = id))
     }
 
     fun toSaveReview(id: String, mode: SaveReviewMode) {
-        this.updateUiState(UiState(reviewId = id, detailsMode = mode))
+        this.updateUiState(ReviewsUiState(reviewId = id, detailsMode = mode))
     }
 
     fun toReviewsList() {
-        this.updateUiState(UiState())
+        this.updateUiState(ReviewsUiState())
     }
 
-    private fun updateUiState(newState: UiState) {
-        uiState.value = newState
+    private fun updateUiState(newState: ReviewsUiState) {
+        reviewsUiState = newState;
+        uiStateObserver.value = newState
     }
 }

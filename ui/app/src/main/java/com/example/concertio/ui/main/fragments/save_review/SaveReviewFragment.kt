@@ -16,7 +16,7 @@ import androidx.navigation.findNavController
 import com.example.concertio.R
 import com.example.concertio.data.reviews.ReviewWithReviewer
 import com.example.concertio.ui.main.ReviewsViewModel
-import com.example.concertio.ui.main.UiState
+import com.example.concertio.ui.main.ReviewsUiState
 import com.example.concertio.data.reviews.ReviewModel
 import com.google.firebase.auth.FirebaseAuth
 
@@ -41,12 +41,12 @@ class SaveReviewFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        viewModel.getUiStateObserver().observe(viewLifecycleOwner) { uiState ->
+        viewModel.observeUiState().observe(viewLifecycleOwner) { uiState ->
             setupToolbar(uiState)
             setupActions(view, uiState)
-            viewModel.getReviewById(uiState.reviewId)
-                .observe(viewLifecycleOwner, ::setupInputFields)
         }
+
+        viewModel.getReviewById().observe(viewLifecycleOwner, ::setupInputFields)
         super.onViewCreated(view, savedInstanceState)
     }
 
@@ -61,9 +61,9 @@ class SaveReviewFragment : Fragment() {
         }
     }
 
-    private fun setupToolbar(uiState: UiState) {
+    private fun setupToolbar(reviewsUiState: ReviewsUiState) {
         activity?.findViewById<Toolbar>(R.id.toolbar)?.apply {
-            when (uiState.detailsMode) {
+            when (reviewsUiState.detailsMode) {
                 SaveReviewMode.ADD -> {
                     title = "Add Review"
                     menu[0].isVisible = false
@@ -79,14 +79,14 @@ class SaveReviewFragment : Fragment() {
         }
     }
 
-    private fun setupActions(view: View, uiState: UiState) {
+    private fun setupActions(view: View, reviewsUiState: ReviewsUiState) {
         val nav = view.findNavController()
-        if (uiState.detailsMode == SaveReviewMode.ADD) {
+        if (reviewsUiState.detailsMode == SaveReviewMode.ADD) {
             deleteButton?.isVisible = false
         }
 
         deleteButton?.setOnClickListener {
-            viewModel.deleteReviewById(uiState.reviewId) {
+            viewModel.deleteReviewByCurrentId() {
                 viewModel.toReviewsList()
                 nav.navigate(SaveReviewFragmentDirections.actionSaveReviewFragmentToReviewsListFragment())
             }

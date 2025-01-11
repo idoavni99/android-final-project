@@ -39,9 +39,7 @@ class ReviewsListFragment : Fragment() {
             if(it.isEmpty()) viewModel.invalidateReviews()
             (reviewsList.adapter as? ReviewsAdapter)?.updateReviews(it)
         })
-        viewModel.getUiStateObserver().observe(viewLifecycleOwner, {
-            setupToolbar(view)
-        })
+        setupToolbar(view)
     }
 
     private fun setupToolbar(view: View) {
