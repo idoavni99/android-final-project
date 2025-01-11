@@ -45,7 +45,7 @@ class AuthActivity : AppCompatActivity() {
         }
 
         AuthUI.getInstance().apply {
-            if (auth.currentUser != null) {
+            if (FirebaseAuth.getInstance().currentUser != null) {
                 toApp()
             } else {
                 createSignInIntentBuilder()

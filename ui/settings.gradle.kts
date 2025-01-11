@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Stundens Manager"
+rootProject.name = "Concert.IO"
 include(":app")
