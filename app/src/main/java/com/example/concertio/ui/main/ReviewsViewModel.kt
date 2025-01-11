@@ -4,45 +4,40 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.concertio.ui.main.fragments.savestudent.StudentDetailsMode
-import com.example.concertio.data.students.StudentModel
-import com.example.concertio.data.students.StudentsRepository
+import com.example.concertio.ui.main.fragments.savestudent.SaveReviewMode
+import com.example.concertio.data.reviews.ReviewModel
+import com.example.concertio.data.reviews.ReviewWithReviewer
+import com.example.concertio.data.reviews.ReviewsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-data class UiState(val studentUid: String = "", val detailsMode: StudentDetailsMode? = null)
+data class UiState(val reviewUid: String = "", val detailsMode: SaveReviewMode? = null)
 
-class StudentsViewModel : ViewModel() {
-    private val repository = StudentsRepository()
+class ReviewsViewModel : ViewModel() {
+    private val repository = ReviewsRepository()
     private val uiState = MutableLiveData(UiState())
 
     fun getUiStateObserver(): LiveData<UiState> {
         return this.uiState
     }
 
-    fun deleteStudentByUid(uid: String, onDeletedUi: () -> Unit = {}) {
+    fun deleteReviewByUid(uid: String, onDeletedUi: () -> Unit = {}) {
         viewModelScope.launch(Dispatchers.Main) {
             repository.deleteStudentByUid(uid)
             onDeletedUi()
         }
     }
 
-    fun getAllStudents(): LiveData<List<StudentModel>> {
+    fun getAllReviews(): LiveData<List<ReviewWithReviewer>> {
         return this.repository.getStudentsList()
     }
 
-    fun getStudentByUid(uid: String = ""): LiveData<StudentModel?> {
+    fun getReviewByUid(uid: String = ""): LiveData<ReviewWithReviewer?> {
         return this.repository.getStudentByUid(uid)
     }
 
-    fun checkStudent(student: StudentModel) {
-        viewModelScope.launch(Dispatchers.Main) {
-            repository.editStudent(student.copy(checked = !student.checked))
-        }
-    }
-
-    fun saveStudent(
-        student: StudentModel,
+    fun saveReview(
+        student: ReviewModel,
         onCompleteUi: () -> Unit = {},
         onErrorUi: (message: String?) -> Unit = {}
     ) {
@@ -50,8 +45,8 @@ class StudentsViewModel : ViewModel() {
             viewModelScope.launch(Dispatchers.Main) {
                 if (it.success) {
                     when (uiState.value?.detailsMode) {
-                        StudentDetailsMode.ADD -> repository.addStudent(student)
-                        StudentDetailsMode.EDIT -> repository.editStudent(student)
+                        SaveReviewMode.ADD -> repository.addStudent(student)
+                        SaveReviewMode.EDIT -> repository.editStudent(student)
                         else -> {}
                     }
                     onCompleteUi()
@@ -62,15 +57,15 @@ class StudentsViewModel : ViewModel() {
         }
     }
 
-    fun toStudentDetails(uid: String) {
-        this.updateUiState(UiState(studentUid = uid))
+    fun toReviewDetails(uid: String) {
+        this.updateUiState(UiState(reviewUid = uid))
     }
 
-    fun toSaveStudent(uid: String, mode: StudentDetailsMode) {
-        this.updateUiState(UiState(studentUid = uid, detailsMode = mode))
+    fun toSaveReview(uid: String, mode: SaveReviewMode) {
+        this.updateUiState(UiState(reviewUid = uid, detailsMode = mode))
     }
 
-    fun toStudentsList() {
+    fun toReviewsList() {
         this.updateUiState(UiState())
     }
 

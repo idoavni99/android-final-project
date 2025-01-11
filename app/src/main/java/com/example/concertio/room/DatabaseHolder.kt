@@ -7,7 +7,8 @@ object DatabaseHolder {
     private var appDatabase: AppDatabase? = null
 
     fun initDatabase(context: Context) {
-        appDatabase = Room.databaseBuilder(context, AppDatabase::class.java, "concert-io-db").build()
+        appDatabase = Room.databaseBuilder(context, AppDatabase::class.java, "concert-io-db")
+            .build()
     }
 
     fun getDatabase(): AppDatabase {

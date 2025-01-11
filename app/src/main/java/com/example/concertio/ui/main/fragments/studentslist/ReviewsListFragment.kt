@@ -14,30 +14,29 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.concertio.R
-import com.example.concertio.ui.main.StudentsViewModel
-import com.example.concertio.ui.main.fragments.savestudent.StudentDetailsMode
-import com.example.concertio.ui.main.fragments.studentslist.StudentsListFragmentDirections.Companion.actionStudentsListFragmentToStudentDetailsFragment
+import com.example.concertio.ui.main.ReviewsViewModel
+import com.example.concertio.ui.main.fragments.savestudent.SaveReviewMode
 
 
-class StudentsListFragment : Fragment() {
-    private lateinit var studentsList: RecyclerView
+class ReviewsListFragment : Fragment() {
+    private lateinit var reviewsList: RecyclerView
     private val toolbar by lazy { activity?.findViewById<Toolbar>(R.id.toolbar) }
-    private val viewModel: StudentsViewModel by activityViewModels()
+    private val viewModel: ReviewsViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_students_list, container, false)
+        return inflater.inflate(R.layout.fragment_reviews_list, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        studentsList = view.findViewById(R.id.students_list)
+        reviewsList = view.findViewById(R.id.students_list)
         context?.let { initStudentsList(it) }
-        viewModel.getAllStudents().observe(viewLifecycleOwner, {
-            (studentsList.adapter as? StudentsAdapter)?.updateStudents(it)
+        viewModel.getAllReviews().observe(viewLifecycleOwner, {
+            (reviewsList.adapter as? ReviewsAdapter)?.updateReviews(it)
         })
         viewModel.getUiStateObserver().observe(viewLifecycleOwner, {
             setupToolbar(view)
@@ -53,21 +52,21 @@ class StudentsListFragment : Fragment() {
             }
 
             setOnMenuItemClickListener {
-                viewModel.toSaveStudent("", StudentDetailsMode.ADD)
+                viewModel.toSaveReview("", SaveReviewMode.ADD)
                 view.findNavController()
-                    .navigate(StudentsListFragmentDirections.actionStudentsListFragmentToSaveStudentFragment())
+                    .navigate(ReviewsListFragmentDirections.actionReviewsListFragmentToSaveReviewFragment())
                 true
             }
         }
     }
 
     private fun initStudentsList(context: Context) {
-        studentsList.run {
+        reviewsList.run {
             layoutManager = LinearLayoutManager(context)
-            adapter = StudentsAdapter({ viewModel.checkStudent(it) }, { (uid) ->
-                viewModel.toStudentDetails(uid)
-                findNavController().navigate(actionStudentsListFragmentToStudentDetailsFragment())
-            })
+            adapter = ReviewsAdapter { (uid) ->
+                viewModel.toReviewDetails(uid)
+                findNavController().navigate(ReviewsListFragmentDirections.actionReviewsListFragmentToReviewDetailsFragment())
+            }
             addItemDecoration(
                 DividerItemDecoration(
                     context,

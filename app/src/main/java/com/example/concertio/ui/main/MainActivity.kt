@@ -16,7 +16,7 @@ import com.example.concertio.R
 class MainActivity : AppCompatActivity() {
     private val toolbar by lazy { findViewById<Toolbar>(R.id.toolbar) }
     private val navHostFragment by lazy { supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment }
-    private val viewModel: StudentsViewModel by viewModels<StudentsViewModel> { ViewModelProvider.NewInstanceFactory() }
+    private val viewModel: ReviewsViewModel by viewModels<ReviewsViewModel> { ViewModelProvider.NewInstanceFactory() }
     val appBarConfig = AppBarConfiguration.Builder().build()
 
     override fun onCreate(savedInstanceState: Bundle?) {

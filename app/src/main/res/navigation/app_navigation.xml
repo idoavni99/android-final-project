@@ -3,39 +3,39 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/app_navigation"
-    app:startDestination="@id/studentsListFragment">
+    app:startDestination="@id/reviewsListFragment">
 
     <fragment
-        android:id="@+id/studentsListFragment"
-        android:name="com.example.concertio.ui.main.fragments.studentslist.StudentsListFragment"
-        android:label="Students List"
-        tools:layout="@layout/fragment_students_list">
+        android:id="@+id/reviewsListFragment"
+        android:name="com.example.concertio.ui.main.fragments.studentslist.ReviewsListFragment"
+        android:label="Reviews List"
+        tools:layout="@layout/fragment_reviews_list">
         <action
-            android:id="@+id/action_studentsListFragment_to_studentDetailsFragment"
-            app:destination="@id/studentDetailsFragment" />
+            android:id="@+id/action_reviewsListFragment_to_reviewDetailsFragment"
+            app:destination="@id/reviewDetailsFragment" />
         <action
-            android:id="@+id/action_studentsListFragment_to_saveStudentFragment"
-            app:destination="@id/saveStudentFragment" />
+            android:id="@+id/action_reviewsListFragment_to_saveReviewFragment"
+            app:destination="@id/saveReviewFragment" />
     </fragment>
     <fragment
-        android:id="@+id/studentDetailsFragment"
-        android:name="com.example.concertio.ui.main.fragments.studentdetails.StudentDetailsFragment"
-        android:label="Student Details"
-        tools:layout="@layout/fragment_student_details">
+        android:id="@+id/reviewDetailsFragment"
+        android:name="com.example.concertio.ui.main.fragments.studentdetails.ReviewDetailsFragment"
+        android:label="Review Details"
+        tools:layout="@layout/fragment_review_details">
         <action
-            android:id="@+id/action_studentDetailsFragment_to_studentsListFragment"
-            app:destination="@id/studentsListFragment" />
+            android:id="@+id/action_reviewDetailsFragment_to_reviewsListFragment"
+            app:destination="@id/reviewsListFragment" />
         <action
-            android:id="@+id/action_studentDetailsFragment_to_saveStudentFragment"
-            app:destination="@id/saveStudentFragment" />
+            android:id="@+id/action_reviewDetailsFragment_to_saveReviewFragment"
+            app:destination="@id/saveReviewFragment" />
     </fragment>
     <fragment
-        android:id="@+id/saveStudentFragment"
-        android:name="com.example.concertio.ui.main.fragments.savestudent.SaveStudentFragment"
-        tools:layout="@layout/fragment_save_student">
+        android:id="@+id/saveReviewFragment"
+        android:name="com.example.concertio.ui.main.fragments.savestudent.SaveReviewFragment"
+        tools:layout="@layout/fragment_save_review">
         <action
-            android:id="@+id/action_saveStudentFragment_to_studentsListFragment"
-            app:destination="@id/studentsListFragment"
+            android:id="@+id/action_saveReviewFragment_to_reviewsListFragment"
+            app:destination="@id/reviewsListFragment"
             app:popUpTo="@id/app_navigation"
             app:popUpToInclusive="true" />
     </fragment>
