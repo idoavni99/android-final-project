@@ -8,8 +8,6 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
-import androidx.appcompat.widget.Toolbar
-import androidx.core.view.get
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
@@ -20,13 +18,12 @@ import com.example.concertio.ui.main.ReviewsUiState
 import com.example.concertio.data.reviews.ReviewModel
 import com.google.firebase.auth.FirebaseAuth
 
-class SaveReviewFragment : Fragment() {
+class EditReviewFragment : Fragment() {
     private val viewModel: ReviewsViewModel by activityViewModels()
     private val artistTextView by lazy { view?.findViewById<EditText>(R.id.review_artist) }
     private val locationTextView by lazy { view?.findViewById<EditText>(R.id.review_location) }
     private val reviewText by lazy { view?.findViewById<EditText>(R.id.save_review_text) }
 
-    private val cancelButton by lazy { view?.findViewById<Button>(R.id.details_cancel_button) }
     private val deleteButton by lazy { view?.findViewById<Button>(R.id.details_delete_button) }
     private val saveButton by lazy { view?.findViewById<Button>(R.id.details_save_button) }
 
@@ -42,7 +39,6 @@ class SaveReviewFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         viewModel.observeUiState().observe(viewLifecycleOwner) { uiState ->
-            setupToolbar(uiState)
             setupActions(view, uiState)
         }
 
@@ -55,60 +51,47 @@ class SaveReviewFragment : Fragment() {
             artistTextView?.setText(artist)
             locationTextView?.setText(location)
             reviewText?.setText(review)
-            this@SaveReviewFragment.reviewerUid = reviewerUid
+            this@EditReviewFragment.reviewerUid = reviewerUid
         } ?: {
             viewModel.invalidateReviewById()
         }
     }
 
-    private fun setupToolbar(reviewsUiState: ReviewsUiState) {
-        activity?.findViewById<Toolbar>(R.id.toolbar)?.apply {
-            when (reviewsUiState.detailsMode) {
-                SaveReviewMode.ADD -> {
-                    title = "Add Review"
-                    menu[0].isVisible = false
-                }
-
-                SaveReviewMode.EDIT -> {
-                    title = "Edit Review"
-                    menu[0].isVisible = false
-                }
-
-                else -> {}
-            }
-        }
-    }
-
     private fun setupActions(view: View, reviewsUiState: ReviewsUiState) {
-        val nav = view.findNavController()
         if (reviewsUiState.detailsMode == SaveReviewMode.ADD) {
             deleteButton?.isVisible = false
         }
 
         deleteButton?.setOnClickListener {
             viewModel.deleteReviewByCurrentId() {
-                viewModel.toReviewsList()
-                nav.navigate(SaveReviewFragmentDirections.actionSaveReviewFragmentToReviewsListFragment())
+                toReviewsList(view)
             }
         }
         saveButton?.setOnClickListener {
-            val reviewData = getReviewFromInputs()
-            viewModel.saveReview(reviewData, {
-                nav.navigate(SaveReviewFragmentDirections.actionSaveReviewFragmentToReviewsListFragment())
-            }, {
-                Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
-            })
+            val reviewData = getReviewFromInputs(reviewsUiState)
+            viewModel.editReview(reviewData,
+                onCompleteUi = {
+                    toReviewsList(view)
+                },
+                onErrorUi = {
+                    Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+                }
+            )
 
-        }
-        cancelButton?.setOnClickListener {
-            nav.navigate(SaveReviewFragmentDirections.actionSaveReviewFragmentToReviewsListFragment())
         }
     }
 
-    private fun getReviewFromInputs() = ReviewModel(
+    private fun toReviewsList(view: View) {
+        val nav = view.findNavController()
+        viewModel.toReviewsList()
+        nav.navigate(EditReviewFragmentDirections.actionEditReviewFragmentToUserProfileFragment())
+    }
+
+    private fun getReviewFromInputs(uiState: ReviewsUiState) = ReviewModel(
         location = locationTextView?.text.toString(),
         artist = artistTextView?.text.toString(),
         review = reviewText?.text.toString(),
-        reviewerUid = reviewerUid
+        reviewerUid = reviewerUid,
+        id = uiState.reviewId
     )
 }

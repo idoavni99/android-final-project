@@ -17,14 +17,14 @@ interface UsersDao {
     suspend fun getExistingUserIds(uids: List<String>): List<String>
 
     @Upsert
-    fun upsertAll(vararg users: UserModel)
+    suspend fun upsertAll(vararg users: UserModel)
 
     @Query("DELETE FROM users")
-    fun deleteAll()
+    suspend fun deleteAll()
 
     @Query("DELETE FROM users WHERE uid = :uid")
-    fun deleteByUid(uid: String)
+    suspend fun deleteByUid(uid: String)
 
-    @Update
-    fun updateUserData(user: UserModel)
+    @Query("SELECT * FROM users WHERE uid = :uid")
+    fun getMyUserObservable(uid: String): LiveData<UserModel?>
 }

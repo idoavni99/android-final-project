@@ -1,6 +1,7 @@
 package com.example.concertio.data.reviews
 
 import com.google.firebase.firestore.GeoPoint
+import java.sql.Timestamp
 
 data class RemoteSourceReview(
     val artist: String? = null,
@@ -10,7 +11,8 @@ data class RemoteSourceReview(
     val reviewer_uid: String? = null,
     val media_id: String? = null,
     val media_type: String? = null,
-    val id: String? = null
+    val id: String? = null,
+    val updated_at: Long? = System.currentTimeMillis()
 ) {
     fun toReviewModel(): ReviewModel {
         return ReviewModel(

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.main.fragments.save_review.SaveReviewFragment">
+    tools:context=".ui.main.fragments.save_review.EditReviewFragment">
 
     <ImageView
         android:id="@+id/save_student_image"
@@ -17,22 +17,11 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/save_student_layout"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/save_student_image">
-
-        <TextView
-            android:id="@+id/save_review_location_description"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:text="location:"
-            android:textSize="30sp"
-            app:layout_constraintBaseline_toBaselineOf="@+id/review_location"
-            app:layout_constraintStart_toStartOf="parent" />
 
         <EditText
             android:id="@+id/review_location"
@@ -44,31 +33,20 @@
             android:inputType="text"
             android:minWidth="128dp"
             android:minHeight="64dp"
-            app:layout_constraintStart_toEndOf="@id/save_review_location_description"
-            app:layout_constraintTop_toTopOf="@id/save_student_layout" />
-
-        <TextView
-            android:id="@+id/review_artist_description"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="artist:"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:textSize="30sp"
-            app:layout_constraintBaseline_toBaselineOf="@+id/review_artist"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <EditText
             android:id="@+id/review_artist"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="Artist Name"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
+            android:hint="Artist Name"
             android:minWidth="128dp"
             android:minHeight="64dp"
-            app:layout_constraintStart_toEndOf="@id/review_artist_description"
-            app:layout_constraintTop_toBottomOf="@id/save_review_location_description" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/review_location" />
 
         <EditText
             android:id="@+id/save_review_text"
@@ -79,32 +57,27 @@
             android:hint="Review Text"
             android:inputType="textMultiLine"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/review_artist_description" />
+            app:layout_constraintTop_toBottomOf="@id/review_artist" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <Button
-        android:id="@+id/details_cancel_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Cancel"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/details_delete_button"
-        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/details_delete_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
         android:text="Delete"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/details_save_button"
-        app:layout_constraintStart_toEndOf="@id/details_cancel_button" />
+        app:layout_constraintStart_toStartOf="parent" />
+    0
+    1
 
     <Button
         android:id="@+id/details_save_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
         android:text="Save"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

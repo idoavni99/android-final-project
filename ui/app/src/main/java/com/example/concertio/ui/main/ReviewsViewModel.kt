@@ -14,9 +14,10 @@ import kotlinx.coroutines.launch
 data class ReviewsUiState(val reviewId: String = "", val detailsMode: SaveReviewMode? = null)
 
 class ReviewsViewModel : ViewModel() {
-    private val repository = ReviewsRepository()
+    private val repository = ReviewsRepository.getInstance()
     private var reviewsUiState = ReviewsUiState()
     private val uiStateObserver = MutableLiveData(reviewsUiState)
+
     init {
         viewModelScope.launch(Dispatchers.IO) {
             repository.loadReviewsFromRemoteSource(50, 0)
@@ -34,8 +35,8 @@ class ReviewsViewModel : ViewModel() {
         }
     }
 
-    fun getAllReviews(): LiveData<List<ReviewWithReviewer>> {
-        return this.repository.getReviewsList(50, 0, viewModelScope)
+    fun getReviews(shouldGetMyReviews: Boolean = false): LiveData<List<ReviewWithReviewer>> {
+        return this.repository.getReviewsList(50, 0, shouldGetMyReviews)
     }
 
     fun invalidateReviews() {
@@ -56,19 +57,32 @@ class ReviewsViewModel : ViewModel() {
         return this.repository.getReviewById(reviewsUiState.reviewId)
     }
 
-    fun saveReview(
+    fun addReview(
         review: ReviewModel,
         onCompleteUi: () -> Unit = {},
         onErrorUi: (message: String?) -> Unit = {}
     ) {
+        saveReview(review, onCompleteUi, onErrorUi, true)
+    }
+
+    fun editReview(
+        review: ReviewModel,
+        onCompleteUi: () -> Unit = {},
+        onErrorUi: (message: String?) -> Unit = {}
+    ) {
+        saveReview(review, onCompleteUi, onErrorUi, false)
+    }
+
+    private fun saveReview(
+        review: ReviewModel,
+        onCompleteUi: () -> Unit = {},
+        onErrorUi: (message: String?) -> Unit = {},
+        add: Boolean
+    ) {
         review.validate().let {
             viewModelScope.launch(Dispatchers.Main) {
                 if (it.success) {
-                    when (reviewsUiState.detailsMode) {
-                        SaveReviewMode.ADD -> repository.addReview(review)
-                        SaveReviewMode.EDIT -> repository.editReview(review)
-                        else -> {}
-                    }
+                    if (add) repository.addReview(review) else repository.editReview(review)
                     onCompleteUi()
                 } else {
                     onErrorUi(it.message)

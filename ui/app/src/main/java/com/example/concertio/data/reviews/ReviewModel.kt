@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey
 import com.example.concertio.data.ValidationResult
 import com.example.concertio.data.users.UserModel
 import com.google.firebase.auth.FirebaseAuth
+import java.sql.Timestamp
 import java.util.UUID
 
 @Entity(
@@ -18,11 +19,15 @@ import java.util.UUID
     )]
 )
 data class ReviewModel(
-    @PrimaryKey val id: String = UUID.randomUUID().toString(),
+    @PrimaryKey val id: String,
     @ColumnInfo(name = "location") val location: String? = null,
     @ColumnInfo(name = "reviewer_uid") val reviewerUid: String,
     @ColumnInfo(name = "artist") val artist: String? = null,
     @ColumnInfo(name = "review") val review: String,
+    @ColumnInfo(
+        name = "updated_at",
+        defaultValue = "0",
+    ) val updatedAt: Long = System.currentTimeMillis()
 ) {
     fun validate(): ValidationResult {
         try {

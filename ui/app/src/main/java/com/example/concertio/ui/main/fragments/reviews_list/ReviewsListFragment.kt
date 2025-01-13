@@ -6,7 +6,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.widget.Toolbar
 import androidx.core.view.get
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
@@ -16,11 +15,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.concertio.R
 import com.example.concertio.ui.main.ReviewsViewModel
 import com.example.concertio.ui.main.fragments.save_review.SaveReviewMode
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 
 class ReviewsListFragment : Fragment() {
     private lateinit var reviewsList: RecyclerView
-    private val toolbar by lazy { activity?.findViewById<Toolbar>(R.id.toolbar) }
     private val viewModel: ReviewsViewModel by activityViewModels()
 
     override fun onCreateView(
@@ -34,37 +33,20 @@ class ReviewsListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         reviewsList = view.findViewById(R.id.students_list)
-        context?.let { initStudentsList(it) }
-        viewModel.getAllReviews().observe(viewLifecycleOwner, {
-            if(it.isEmpty()) viewModel.invalidateReviews()
+        initStudentsList(view)
+        viewModel.getReviews().observe(viewLifecycleOwner, {
+            if (it.isEmpty()) viewModel.invalidateReviews()
             (reviewsList.adapter as? ReviewsAdapter)?.updateReviews(it)
         })
-        setupToolbar(view)
     }
 
-    private fun setupToolbar(view: View) {
-        toolbar?.apply {
-            navigationIcon = null
-            menu[0].apply {
-                title = "Add"
-                isVisible = true
-            }
-
-            setOnMenuItemClickListener {
-                viewModel.toSaveReview("", SaveReviewMode.ADD)
-                view.findNavController()
-                    .navigate(ReviewsListFragmentDirections.actionReviewsListFragmentToSaveReviewFragment())
-                true
-            }
-        }
-    }
-
-    private fun initStudentsList(context: Context) {
+    private fun initStudentsList(view: View) {
         reviewsList.run {
-            layoutManager = LinearLayoutManager(context)
+            layoutManager = LinearLayoutManager(view.context)
             adapter = ReviewsAdapter { (uid) ->
                 viewModel.toReviewDetails(uid)
-                findNavController().navigate(ReviewsListFragmentDirections.actionReviewsListFragmentToReviewDetailsFragment())
+                view.findNavController()
+                    .navigate(ReviewsListFragmentDirections.actionReviewsListFragmentToReviewDetailsFragment())
             }
             addItemDecoration(
                 DividerItemDecoration(

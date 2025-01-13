@@ -1,6 +1,7 @@
 package com.example.concertio.data.users
 
 import com.example.concertio.room.DatabaseHolder
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Dispatchers
@@ -11,8 +12,12 @@ class UsersRepository {
     private val usersDao = DatabaseHolder.getDatabase().usersDao()
     private val firestoreHandle = Firebase.firestore.collection("users")
 
+    fun getMyUid() = FirebaseAuth.getInstance().currentUser!!.uid
+
+    fun getMyUserObservable() = usersDao.getMyUserObservable(getMyUid())
+
     suspend fun insertUsers(vararg users: UserModel) = withContext(Dispatchers.IO) {
-        firestoreHandle.add(users).await()
+        firestoreHandle.add(users.map { it.toRemoteSourceUser() }).await()
         usersDao.upsertAll(*users)
     }
 
@@ -23,10 +28,6 @@ class UsersRepository {
 
     suspend fun deleteAllUsers() = withContext(Dispatchers.IO) {
         usersDao.deleteAll()
-    }
-
-    suspend fun deleteById(uid: String) = withContext(Dispatchers.IO) {
-        usersDao.deleteByUid(uid)
     }
 
     suspend fun cacheUserIfNotExisting(uid: String) = withContext(Dispatchers.IO) {
@@ -49,7 +50,7 @@ class UsersRepository {
         return@withContext this@UsersRepository.getUserFromRemoteSource(uid)
     }
 
-    private suspend fun getUserFromRemoteSource(uid: String): UserModel? =
+    suspend fun getUserFromRemoteSource(uid: String): UserModel? =
         withContext(Dispatchers.IO) {
             val user =
                 firestoreHandle.document(uid).get().await().toObject(RemoteSourceUser::class.java)
@@ -71,4 +72,9 @@ class UsersRepository {
             }
             return@withContext users
         }
+
+    companion object {
+        private val instance = UsersRepository()
+        fun getInstance() = instance
+    }
 }

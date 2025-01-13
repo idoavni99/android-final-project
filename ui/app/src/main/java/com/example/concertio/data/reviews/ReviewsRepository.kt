@@ -10,29 +10,35 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
-class ReviewsRepository() {
+class ReviewsRepository {
     private val reviewsDao = DatabaseHolder.getDatabase().reviewsDao()
-    private val usersRepository = UsersRepository()
+    private val usersRepository = UsersRepository.getInstance()
     private val firestoreHandle = Firebase.firestore.collection("reviews")
 
-    suspend fun addReview(vararg reviews: ReviewModel) = withContext(Dispatchers.IO) {
-        val batchHandle = Firebase.firestore.batch()
-        reviews.forEach {
-            batchHandle.set(firestoreHandle.document(it.id), it.toRemoteSource())
-        }
-        batchHandle.commit().await()
-
-        reviewsDao.upsertAll(*reviews)
+    suspend fun addReview(review: ReviewModel) = withContext(Dispatchers.IO) {
+        val remoteSourceReview = review.toRemoteSource()
+        firestoreHandle.document(review.id).set(remoteSourceReview).await()
+        reviewsDao.upsertAll(review)
     }
 
     suspend fun editReview(review: ReviewModel) = withContext(Dispatchers.IO) {
-        firestoreHandle.document(review.id).set(review.toRemoteSource()).await()
+        firestoreHandle.document(review.id).update(
+            hashMapOf(
+                Pair("location", review.location),
+                Pair("artist", review.artist),
+                Pair("review", review.review)
+            ).filterNot { it.value == null }
+        ).await()
         reviewsDao.update(review)
     }
 
     suspend fun deleteReviewById(id: String) = withContext(Dispatchers.IO) {
         firestoreHandle.document(id).delete().await()
         reviewsDao.deleteById(id)
+    }
+
+    suspend fun deleteAll() = withContext(Dispatchers.IO) {
+        reviewsDao.deleteAll()
     }
 
     fun getReviewById(id: String): LiveData<ReviewWithReviewer?> {
@@ -42,9 +48,14 @@ class ReviewsRepository() {
     fun getReviewsList(
         limit: Int,
         offset: Int,
-        scope: CoroutineScope
+        getMyReviews: Boolean = false
     ): LiveData<List<ReviewWithReviewer>> {
-        return reviewsDao.getAllPaginated(limit, offset)
+        val myUid = usersRepository.getMyUid()
+        return if (getMyReviews) reviewsDao.getAllMyReviewsPaginated(
+            limit,
+            offset,
+            myUid
+        ) else reviewsDao.getAllOtherPeopleReviewsPaginated(limit, offset, myUid)
     }
 
 
@@ -53,8 +64,8 @@ class ReviewsRepository() {
             firestoreHandle.document(id).get().await().toObject(RemoteSourceReview::class.java)
                 ?.toReviewModel()
         if (review != null) {
-            reviewsDao.upsertAll(review)
             usersRepository.cacheUserIfNotExisting(review.reviewerUid)
+            reviewsDao.upsertAll(review)
         }
         return@withContext reviewsDao.findById(id)
     }
@@ -64,8 +75,13 @@ class ReviewsRepository() {
             val reviews = firestoreHandle.orderBy("review").startAt(offset).limit(limit.toLong())
                 .get().await().toObjects(RemoteSourceReview::class.java).map { it.toReviewModel() }
             if (reviews.isNotEmpty()) {
-                reviewsDao.upsertAll(*reviews.toTypedArray())
                 usersRepository.cacheUsersIfNotExisting(reviews.map { it.reviewerUid })
+                reviewsDao.upsertAll(*reviews.toTypedArray())
             }
         }
+
+    companion object {
+        private val instance = ReviewsRepository()
+        fun getInstance() = instance
+    }
 }
