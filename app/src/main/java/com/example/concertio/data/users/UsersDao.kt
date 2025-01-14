@@ -11,20 +11,20 @@ import androidx.room.Upsert
 @Dao
 interface UsersDao {
     @Query("SELECT * FROM users WHERE uid LIKE :uid LIMIT 1")
-    fun getUserByUid(uid: String): LiveData<UserModel>
+    suspend fun getUserByUid(uid: String): UserModel?
 
-    @Insert
-    fun insertAll(vararg users: UserModel)
-
-    @Query("DELETE FROM users")
-    fun deleteAll()
-
-    @Query("DELETE FROM users WHERE uid = :uid")
-    fun deleteByUid(uid: String)
-
-    @Update
-    fun updateUserData(user: UserModel)
+    @Query("SELECT uid FROM users WHERE uid IN (:uids)")
+    suspend fun getExistingUserIds(uids: List<String>): List<String>
 
     @Upsert
-    fun upsert(user: UserModel)
+    suspend fun upsertAll(vararg users: UserModel)
+
+    @Query("DELETE FROM users")
+    suspend fun deleteAll()
+
+    @Query("DELETE FROM users WHERE uid = :uid")
+    suspend fun deleteByUid(uid: String)
+
+    @Query("SELECT * FROM users WHERE uid = :uid")
+    fun getMyUserObservable(uid: String): LiveData<UserModel?>
 }

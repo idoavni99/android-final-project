@@ -1,75 +1,63 @@
 package com.example.concertio.ui.main
 
+import android.net.Uri
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.concertio.ui.main.fragments.savestudent.SaveReviewMode
 import com.example.concertio.data.reviews.ReviewModel
 import com.example.concertio.data.reviews.ReviewWithReviewer
 import com.example.concertio.data.reviews.ReviewsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-data class UiState(val reviewUid: String = "", val detailsMode: SaveReviewMode? = null)
-
 class ReviewsViewModel : ViewModel() {
-    private val repository = ReviewsRepository()
-    private val uiState = MutableLiveData(UiState())
+    private val repository = ReviewsRepository.getInstance()
 
-    fun getUiStateObserver(): LiveData<UiState> {
-        return this.uiState
-    }
-
-    fun deleteReviewByUid(uid: String, onDeletedUi: () -> Unit = {}) {
+    fun deleteReviewById(id: String, onDeletedUi: () -> Unit = {}) {
         viewModelScope.launch(Dispatchers.Main) {
-            repository.deleteStudentByUid(uid)
+            repository.deleteReviewById(id)
             onDeletedUi()
         }
     }
 
-    fun getAllReviews(): LiveData<List<ReviewWithReviewer>> {
-        return this.repository.getStudentsList()
+    fun getReviews(shouldGetMyReviews: Boolean = false): LiveData<List<ReviewWithReviewer>> {
+        return this.repository.getReviewsList(50, 0, shouldGetMyReviews)
     }
 
-    fun getReviewByUid(uid: String = ""): LiveData<ReviewWithReviewer?> {
-        return this.repository.getStudentByUid(uid)
+    fun invalidateReviews() {
+        viewModelScope.launch {
+            repository.loadReviewsFromRemoteSource(50, 0)
+        }
+    }
+
+    fun invalidateReviewById(id: String) {
+        viewModelScope.launch {
+            repository.loadReviewFromRemoteSource(id)
+        }
+    }
+
+    fun getReviewById(id: String): LiveData<ReviewWithReviewer?> {
+        return this.repository.getReviewById(id)
     }
 
     fun saveReview(
-        student: ReviewModel,
+        review: ReviewModel,
+        filePath: Uri? = null,
         onCompleteUi: () -> Unit = {},
         onErrorUi: (message: String?) -> Unit = {}
     ) {
-        student.validate().let {
+        review.validate().let {
             viewModelScope.launch(Dispatchers.Main) {
                 if (it.success) {
-                    when (uiState.value?.detailsMode) {
-                        SaveReviewMode.ADD -> repository.addStudent(student)
-                        SaveReviewMode.EDIT -> repository.editStudent(student)
-                        else -> {}
+                    val mediaUri = filePath?.let { uri ->
+                        repository.uploadReviewMedia(review.id, uri)
                     }
+                    repository.saveReview(review.copy(mediaUri = mediaUri?.toString()))
                     onCompleteUi()
                 } else {
                     onErrorUi(it.message)
                 }
             }
         }
-    }
-
-    fun toReviewDetails(uid: String) {
-        this.updateUiState(UiState(reviewUid = uid))
-    }
-
-    fun toSaveReview(uid: String, mode: SaveReviewMode) {
-        this.updateUiState(UiState(reviewUid = uid, detailsMode = mode))
-    }
-
-    fun toReviewsList() {
-        this.updateUiState(UiState())
-    }
-
-    private fun updateUiState(newState: UiState) {
-        uiState.value = newState
     }
 }

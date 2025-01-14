@@ -13,5 +13,4 @@ data class ReviewWithReviewer(
         parentColumn = "reviewer_uid",
         entityColumn = "uid"
     ) val reviewer: UserModel
-) {
-}
+)
