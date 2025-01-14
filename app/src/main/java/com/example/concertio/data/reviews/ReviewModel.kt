@@ -1,0 +1,63 @@
+package com.example.concertio.data.reviews
+
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.PrimaryKey
+import com.example.concertio.data.ValidationResult
+import com.example.concertio.data.users.UserModel
+import com.google.firebase.auth.FirebaseAuth
+import java.sql.Timestamp
+import java.util.UUID
+
+@Entity(
+    tableName = "reviews",
+    foreignKeys = [ForeignKey(
+        entity = UserModel::class,
+        parentColumns = ["uid"],
+        childColumns = ["reviewer_uid"]
+    )]
+)
+data class ReviewModel(
+    @PrimaryKey val id: String,
+    @ColumnInfo(name = "location") val location: String? = null,
+    @ColumnInfo(name = "reviewer_uid") val reviewerUid: String,
+    @ColumnInfo(name = "artist") val artist: String? = null,
+    @ColumnInfo(name = "review") val review: String,
+    @ColumnInfo(
+        name = "updated_at",
+        defaultValue = "0",
+    ) val updatedAt: Long = System.currentTimeMillis(),
+    @ColumnInfo(
+        name = "stars",
+        defaultValue = "4"
+    ) val stars: Long = 4,
+    @ColumnInfo(
+        name = "media_type",
+    ) val mediaType: String? = null,
+    @ColumnInfo(
+        name = "media_uri"
+    ) val mediaUri: String? = null,
+) {
+    fun validate(): ValidationResult {
+        try {
+            require(review.isNotEmpty()) { "Review cannot be empty" }
+            return ValidationResult()
+        } catch (e: IllegalArgumentException) {
+            return ValidationResult(e)
+        }
+    }
+
+    fun toRemoteSource(): RemoteSourceReview {
+        return RemoteSourceReview(
+            artist = artist,
+            location_name = location,
+            review = review,
+            reviewer_uid = reviewerUid,
+            id = id,
+            media_type = mediaType
+        )
+    }
+}
+
+

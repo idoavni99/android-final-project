@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/student_list_item"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/reviewer_image"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:src="@drawable/empty_profile_picture"
+        app:layout_constraintBottom_toTopOf="@id/review_location_artist"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/reviewer" />
+
+    <TextView
+        android:id="@+id/reviewer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Reviewer Name"
+        android:textSize="30sp"
+        app:layout_constraintStart_toEndOf="@id/reviewer_image"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <RatingBar
+        android:id="@+id/review_stars"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:isIndicator="true"
+        app:layout_constraintStart_toEndOf="@id/reviewer_image"
+        app:layout_constraintTop_toBottomOf="@id/reviewer" />
+
+    <TextView
+        android:id="@+id/review_location_artist"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Review Location and Artist"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="@id/review_stars"
+        app:layout_constraintTop_toBottomOf="@id/review_stars" />
+</androidx.constraintlayout.widget.ConstraintLayout>
