@@ -42,19 +42,17 @@ class ReviewsViewModel : ViewModel() {
 
     fun saveReview(
         review: ReviewModel,
-        filePath: Uri? = null,
+        mediaUri: Uri?,
         onCompleteUi: () -> Unit = {},
         onErrorUi: (message: String?) -> Unit = {}
     ) {
         review.validate().let {
             viewModelScope.launch(Dispatchers.Main) {
                 if (it.success) {
-                    val mediaUri = filePath?.let { uri ->
-                        repository.uploadReviewMedia(review.id, uri)
-                    }
+                    val uri = if(mediaUri == null || mediaUri.scheme != "https") mediaUri else repository.uploadReviewMedia(review.id, mediaUri)
                     repository.saveReview(
                         review.copy(
-                            mediaUri = mediaUri?.toString() ?: review.mediaUri
+                            mediaUri = uri.toString()
                         )
                     )
                     onCompleteUi()
