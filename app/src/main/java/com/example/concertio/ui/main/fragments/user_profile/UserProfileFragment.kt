@@ -59,7 +59,7 @@ class UserProfileFragment : Fragment() {
                         true
                     }
                     menu.findItem(R.id.editProfile).setOnMenuItemClickListener {
-                        findNavController().navigate(UserProfileFragmentDirections.actionUserProfileFragmentToEditProfileFragment())
+                        findNavController().navigate(UserProfileFragmentDirections.actionUserProfileFragmentToSettingsFragment())
                         true
                     }
                 }

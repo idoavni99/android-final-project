@@ -10,6 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
         android:src="@drawable/baseline_edit_location_24"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -18,8 +19,7 @@
         android:id="@+id/review_location"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Review Location"
-        android:textColor="@color/titleTextColor"
+        android:text="@string/review_location_placeholder"
         android:textSize="24sp"
         app:layout_constraintStart_toEndOf="@id/review_location_icon"
         app:layout_constraintTop_toTopOf="parent" />
@@ -28,44 +28,65 @@
         android:id="@+id/review_artist_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
         android:src="@drawable/baseline_artist_24"
         app:layout_constraintBottom_toBottomOf="@id/review_artist"
-        app:layout_constraintEnd_toStartOf="@id/review_artist" />
+        app:layout_constraintStart_toEndOf="@id/review_location" />
 
     <TextView
         android:id="@+id/review_artist"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Review Artist"
+        android:text="@string/review_artist_placeholder"
         android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/review_artist_icon"
         app:layout_constraintTop_toTopOf="parent" />
 
     <RatingBar
-        android:id="@+id/user_review_stars"
+        android:id="@+id/review_stars"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
         android:isIndicator="true"
+        android:scaleX="0.5"
+        android:scaleY="0.5"
+        android:transformPivotX="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/review_location" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/edit_review_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@android:color/transparent"
+        android:text="@string/edit"
+        android:textColor="?attr/titleTextColor"
+        app:icon="@drawable/baseline_edit_24"
+        app:iconTint="?attr/titleTextColor"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/review_stars"
+        app:layout_constraintTop_toTopOf="@id/review_stars" />
+
+    <include
+        android:id="@+id/review_media"
+        layout="@layout/review_media_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/review_artist" />
+        app:layout_constraintTop_toBottomOf="@id/review_stars" />
 
     <TextView
         android:id="@+id/review_text"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:text="Review Text"
+        android:text="@string/review_text_placeholder"
         android:textSize="36sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/user_review_stars" />
+        app:layout_constraintTop_toBottomOf="@id/review_media" />
 
-    <ImageView
-        android:id="@+id/user_review_thumbnail"
-        android:layout_width="128dp"
-        android:layout_height="128dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

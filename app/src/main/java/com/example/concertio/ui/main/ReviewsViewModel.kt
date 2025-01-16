@@ -20,8 +20,8 @@ class ReviewsViewModel : ViewModel() {
         }
     }
 
-    fun getReviews(shouldGetMyReviews: Boolean = false): LiveData<List<ReviewWithReviewer>> {
-        return this.repository.getReviewsList(50, 0, shouldGetMyReviews)
+    fun getReviews(getOnlyMyReviews: Boolean = false): LiveData<List<ReviewWithReviewer>> {
+        return this.repository.getReviewsList(50, 0, getOnlyMyReviews)
     }
 
     fun invalidateReviews() {
@@ -52,7 +52,11 @@ class ReviewsViewModel : ViewModel() {
                     val mediaUri = filePath?.let { uri ->
                         repository.uploadReviewMedia(review.id, uri)
                     }
-                    repository.saveReview(review.copy(mediaUri = mediaUri?.toString()))
+                    repository.saveReview(
+                        review.copy(
+                            mediaUri = mediaUri?.toString() ?: review.mediaUri
+                        )
+                    )
                     onCompleteUi()
                 } else {
                     onErrorUi(it.message)

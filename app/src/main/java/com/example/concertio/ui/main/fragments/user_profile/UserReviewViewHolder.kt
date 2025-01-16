@@ -1,31 +1,50 @@
 package com.example.concertio.ui.main.fragments.user_profile
 
+import android.net.Uri
 import android.view.View
+import android.widget.ImageView
 import android.widget.RatingBar
 import android.widget.TextView
+import android.widget.VideoView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.concertio.R
 import com.example.concertio.data.reviews.ReviewModel
 import com.example.concertio.data.reviews.ReviewWithReviewer
+import com.example.concertio.extensions.initMedia
+import com.google.android.material.button.MaterialButton
 
 class UserReviewViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     val reviewLocation: TextView = itemView.findViewById(R.id.review_location)
     val reviewArtist: TextView = itemView.findViewById(R.id.review_artist)
     val reviewText: TextView = itemView.findViewById(R.id.review_text)
-    val stars: RatingBar = itemView.findViewById(R.id.user_review_stars)
+    val stars: RatingBar = itemView.findViewById(R.id.review_stars)
+    val image: ImageView = itemView.findViewById(R.id.review_image)
+    val video: VideoView = itemView.findViewById(R.id.review_video)
+    val editButton: MaterialButton = itemView.findViewById(R.id.edit_review_button)
 
     companion object {
         fun bind(
             holder: UserReviewViewHolder,
             currentReview: ReviewWithReviewer,
-            onReviewClicked: (review: ReviewModel) -> Unit
+            onReviewClicked: ((review: ReviewModel) -> Unit)?
         ) {
             holder.reviewLocation.text = currentReview.review.location
             holder.reviewArtist.text = currentReview.review.artist
             holder.reviewText.text = currentReview.review.review
             holder.stars.rating = currentReview.review.stars.toFloat()
-            holder.itemView.setOnClickListener {
-                onReviewClicked(currentReview.review)
+
+            currentReview.review.mediaUri?.let {
+                initMedia(
+                    holder.itemView.context,
+                    holder.image,
+                    holder.video,
+                    Uri.parse(it),
+                    currentReview.review.mediaType!!
+                )
+            }
+
+            holder.editButton.setOnClickListener {
+                onReviewClicked?.invoke(currentReview.review)
             }
         }
     }

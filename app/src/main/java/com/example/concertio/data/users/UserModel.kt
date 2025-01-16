@@ -22,7 +22,8 @@ data class UserModel(
         return RemoteSourceUser(
             uid = uid,
             name = name,
-            email = email
+            email = email,
+            profilePicture = profilePicture
         )
     }
 }

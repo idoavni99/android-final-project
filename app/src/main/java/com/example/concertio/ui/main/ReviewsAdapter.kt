@@ -16,7 +16,7 @@ enum class ReviewType {
 }
 
 class ReviewsAdapter(
-    private val onReviewClicked: (ReviewModel) -> Unit,
+    private val onReviewClicked: ((ReviewModel) -> Unit)? = null,
     private val reviewType: ReviewType
 ) :
     RecyclerView.Adapter<ViewHolder>() {

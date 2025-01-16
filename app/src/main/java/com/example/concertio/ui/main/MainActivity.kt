@@ -2,6 +2,7 @@ package com.example.concertio.ui.main
 
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -10,6 +11,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.get
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import com.example.concertio.R
@@ -40,11 +42,15 @@ class MainActivity : AppCompatActivity() {
             }
 
             myProfileData.profilePicture?.let {
-                bottomNav.menu[2].loadImage(
-                    applicationContext,
-                    Uri.parse(it),
-                    R.drawable.empty_profile_picture
-                )
+                bottomNav.itemIconTintList = null
+                bottomNav.menu.findItem(R.id.userProfileFragment).apply {
+                    loadImage(
+                        applicationContext,
+                        Uri.parse(it),
+                        R.drawable.empty_profile_picture,
+                        lifecycleScope
+                    )
+                }
             }
         }
     }

@@ -10,7 +10,7 @@
         android:id="@+id/user_profile_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
+        android:background="?attr/colorPrimaryVariant"
         android:theme="@style/Base.Theme.ConcertIO"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -27,7 +27,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start"
-            android:text="Title Text"
             android:textColor="@color/black"
             android:textSize="24sp" />
     </Toolbar>

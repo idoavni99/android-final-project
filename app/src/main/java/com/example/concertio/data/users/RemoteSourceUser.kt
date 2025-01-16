@@ -8,12 +8,12 @@ data class RemoteSourceUser(
     val email: String? = null,
     val profilePicture: String? = null
 ) {
-    fun toUserModel(profilePictureUri: Uri? = null): UserModel {
+    fun toUserModel(): UserModel {
         return UserModel(
             uid = uid!!,
             name = name!!,
             email = email!!,
-            profilePicture = profilePictureUri?.toString()
+            profilePicture = profilePicture
         )
     }
 }

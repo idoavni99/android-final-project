@@ -29,24 +29,33 @@ class UserProfileViewModel : ViewModel() {
         FirebaseAuth.getInstance().signOut()
     }
 
-    fun updateProfile(name: String, email: String, password: String, photoUri: Uri, onCompleteUi: ()->Unit) =
+    fun updateProfile(
+        name: String,
+        photoUri: Uri,
+        onCompleteUi: () -> Unit
+    ) =
         viewModelScope.launch(Dispatchers.Main) {
-            val userInFirebase = FirebaseAuth.getInstance().currentUser
-            var destinationModel = UserModel(name = name, email = email)
-            userInFirebase?.let {
-                if (photoUri.scheme !== "content") {
+            FirebaseAuth.getInstance().currentUser?.let {
+                if (photoUri.scheme != "https") {
                     val profilePictureUri = usersRepository.uploadUserProfilePictureToFirebase(
                         photoUri,
-                        userInFirebase.uid
+                        it.uid
                     )
-                    destinationModel =
-                        destinationModel.copy(profilePicture = profilePictureUri.toString())
+                    usersRepository.updateUserDetails(name, profilePictureUri!!)
+                } else {
+                    usersRepository.updateUserDetails(name, photoUri)
                 }
-                usersRepository.updateUserDetails(
-                    destinationModel.copy(uid = userInFirebase.uid),
-                    password
-                )
                 onCompleteUi()
             }
         }
+
+    fun updateAuth(
+        email: String?,
+        password: String?,
+        onCompleteUi: () -> Unit
+    ) = viewModelScope.launch {
+        if (email == null && password == null) return@launch
+        usersRepository.updateUserAuth(email, password)
+        onCompleteUi()
+    }
 }

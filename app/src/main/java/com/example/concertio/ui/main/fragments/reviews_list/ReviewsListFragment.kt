@@ -30,7 +30,7 @@ class ReviewsListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        reviewsList = view.findViewById(R.id.students_list)
+        reviewsList = view.findViewById(R.id.reviews_list)
         initStudentsList(view)
         viewModel.getReviews().observe(viewLifecycleOwner, {
             if (it.isEmpty()) viewModel.invalidateReviews()
@@ -41,14 +41,7 @@ class ReviewsListFragment : Fragment() {
     private fun initStudentsList(view: View) {
         reviewsList.run {
             layoutManager = LinearLayoutManager(view.context)
-            adapter = ReviewsAdapter({ (id) ->
-                view.findNavController()
-                    .navigate(
-                        ReviewsListFragmentDirections.actionReviewsListFragmentToReviewDetailsFragment(
-                            id
-                        )
-                    )
-            }, ReviewType.REVIEW)
+            adapter = ReviewsAdapter(reviewType = ReviewType.REVIEW)
             addItemDecoration(
                 DividerItemDecoration(
                     context,

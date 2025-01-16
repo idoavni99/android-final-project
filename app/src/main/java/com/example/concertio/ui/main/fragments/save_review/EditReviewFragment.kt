@@ -10,8 +10,10 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.concertio.R
 import com.example.concertio.data.reviews.ReviewWithReviewer
+import com.example.concertio.extensions.initMedia
 import com.example.concertio.extensions.loadReviewImage
 import com.example.concertio.extensions.showProgress
+import com.google.android.material.button.MaterialButton
 
 class EditReviewFragment : AddReviewFragment() {
     private val args by navArgs<EditReviewFragmentArgs>()
@@ -26,7 +28,10 @@ class EditReviewFragment : AddReviewFragment() {
 
     override fun setupView(view: View) {
         super.setupView(view)
-        setupDeleteButton(view)
+        view.findViewById<MaterialButton>(R.id.upload_review_button)?.apply {
+            text = "Save Changes"
+            icon = null
+        }
         viewModel.getReviewById(args.reviewId).observe(viewLifecycleOwner, ::setupInputFields)
     }
 
@@ -38,25 +43,13 @@ class EditReviewFragment : AddReviewFragment() {
             reviewStars?.rating = stars.toFloat()
             this@EditReviewFragment.reviewerUid = reviewerUid
             mediaUri?.let {
-                reviewMedia?.loadReviewImage(
-                    requireContext(),
-                    Uri.parse(mediaUri),
-                    R.drawable.baseline_insert_photo_24
-                )
+                val parsedUri = Uri.parse(it)
+                this@EditReviewFragment.mediaUri = parsedUri
+                this@EditReviewFragment.mediaType = mediaType
+                initMedia(requireContext(), reviewImage, reviewVideo, parsedUri, mediaType!!)
             }
         } ?: {
             viewModel.invalidateReviewById(args.reviewId)
-        }
-    }
-
-    private fun setupDeleteButton(view: View) {
-        deleteButton?.isVisible = true
-        deleteButton?.setOnClickListener {
-            deleteButton?.showProgress(resources.getColor(com.google.android.material.R.color.design_default_color_secondary))
-            viewModel.deleteReviewById(args.reviewId) {
-                view.findNavController()
-                    .navigate(EditReviewFragmentDirections.actionEditReviewFragmentToUserProfileFragment())
-            }
         }
     }
 
@@ -64,4 +57,6 @@ class EditReviewFragment : AddReviewFragment() {
         view.findNavController()
             .navigate(EditReviewFragmentDirections.actionEditReviewFragmentToUserProfileFragment())
     }
+
+    override fun getReviewFromInputs() = super.getReviewFromInputs().copy(id = args.reviewId)
 }

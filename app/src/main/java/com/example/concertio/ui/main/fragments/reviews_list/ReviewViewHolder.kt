@@ -5,15 +5,21 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.RatingBar
 import android.widget.TextView
+import android.widget.VideoView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.concertio.R
 import com.example.concertio.data.reviews.ReviewModel
 import com.example.concertio.data.reviews.ReviewWithReviewer
+import com.example.concertio.extensions.initMedia
 import com.example.concertio.extensions.loadProfilePicture
 
 class ReviewViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     val reviewerUid: TextView = itemView.findViewById(R.id.reviewer)
-    val locationAndArtist: TextView = itemView.findViewById(R.id.review_location_artist)
+    val location: TextView = itemView.findViewById(R.id.review_location)
+    val artist: TextView = itemView.findViewById(R.id.review_artist)
+    val text: TextView = itemView.findViewById(R.id.review_text)
+    val image: ImageView = itemView.findViewById(R.id.review_image)
+    val video: VideoView = itemView.findViewById(R.id.review_video)
     val profileImage: ImageView = itemView.findViewById(R.id.reviewer_image)
     val stars: RatingBar = itemView.findViewById(R.id.review_stars)
 
@@ -21,11 +27,12 @@ class ReviewViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(
             holder: ReviewViewHolder,
             currentReview: ReviewWithReviewer,
-            onReviewClicked: (ReviewModel) -> Unit
+            onReviewClicked: ((ReviewModel) -> Unit)?
         ) {
             holder.reviewerUid.text = currentReview.reviewer.name
-            holder.locationAndArtist.text =
-                "${currentReview.review.location} * ${currentReview.review.artist}"
+            holder.location.text = currentReview.review.location
+            holder.artist.text = currentReview.review.artist
+            holder.text.text = currentReview.review.review
             currentReview.reviewer.profilePicture?.let {
                 holder.profileImage.loadProfilePicture(
                     holder.itemView.context,
@@ -33,9 +40,18 @@ class ReviewViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
                     R.drawable.empty_profile_picture
                 )
             }
+            currentReview.review.mediaUri?.let {
+                initMedia(
+                    holder.itemView.context,
+                    holder.image,
+                    holder.video,
+                    Uri.parse(it),
+                    currentReview.review.mediaType!!
+                )
+            }
             holder.stars.rating = currentReview.review.stars.toFloat()
             holder.itemView.setOnClickListener {
-                onReviewClicked(currentReview.review)
+                onReviewClicked?.invoke(currentReview.review)
             }
         }
     }

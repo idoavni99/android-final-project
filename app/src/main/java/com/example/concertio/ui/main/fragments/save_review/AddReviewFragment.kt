@@ -11,15 +11,17 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.RatingBar
 import android.widget.Toast
+import android.widget.VideoView
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
 import com.example.concertio.R
 import com.example.concertio.ui.main.ReviewsViewModel
 import com.example.concertio.data.reviews.ReviewModel
 import com.example.concertio.extensions.FileUploadingFragment
+import com.example.concertio.extensions.initMedia
 import com.example.concertio.extensions.showProgress
+import com.example.concertio.extensions.stopProgress
 import com.google.android.material.button.MaterialButton
 import com.google.firebase.auth.FirebaseAuth
 import java.util.UUID
@@ -28,25 +30,31 @@ open class AddReviewFragment : FileUploadingFragment() {
     var mediaType: String? = null
     var mediaUri: Uri? = null
     protected val viewModel: ReviewsViewModel by activityViewModels()
-    protected val reviewMedia by lazy { view?.findViewById<ImageView>(R.id.save_review_image) }
+    protected val reviewImage by lazy { view?.findViewById<ImageView>(R.id.review_image) }
+    protected val reviewVideo by lazy { view?.findViewById<VideoView>(R.id.review_video) }
+    protected val chooseMediaButton by lazy { view?.findViewById<MaterialButton>(R.id.choose_media) }
     protected val artistTextView by lazy { view?.findViewById<EditText>(R.id.review_artist) }
     protected val locationTextView by lazy { view?.findViewById<EditText>(R.id.review_location) }
     protected val reviewText by lazy { view?.findViewById<EditText>(R.id.save_review_text) }
     protected val reviewStars by lazy { view?.findViewById<RatingBar>(R.id.save_review_stars) }
-    protected val deleteButton by lazy { view?.findViewById<MaterialButton>(R.id.details_delete_button) }
-    protected val saveButton by lazy { view?.findViewById<MaterialButton>(R.id.details_save_button) }
+    protected val saveButton by lazy { view?.findViewById<MaterialButton>(R.id.upload_review_button) }
     protected var reviewerUid: String = FirebaseAuth.getInstance().currentUser!!.uid
 
     private val selectMediaLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 result.data?.data?.let {
-                    reviewMedia?.setImageURI(it)
                     mediaUri = it
                     mediaType =
-                        context?.contentResolver?.getType(it)?.split("/")?.get(0)
+                        context?.run {
+                            val type = contentResolver?.getType(it)?.split("/")?.get(0)
+                            initMedia(this, reviewImage, reviewVideo, it, type!!)
+                            type
+                        }
                 }
             }
+
+            chooseMediaButton?.stopProgress()
         }
 
     override fun onCreateView(
@@ -67,10 +75,8 @@ open class AddReviewFragment : FileUploadingFragment() {
     }
 
     private fun setupActions(view: View) {
-        deleteButton?.isVisible = false
-
         saveButton?.setOnClickListener {
-            saveButton?.showProgress(resources.getColor(com.google.android.material.R.color.design_default_color_secondary))
+            saveButton?.showProgress()
             val reviewData = getReviewFromInputs()
             viewModel.saveReview(reviewData, mediaUri,
                 onCompleteUi = {
@@ -82,7 +88,8 @@ open class AddReviewFragment : FileUploadingFragment() {
             )
         }
 
-        reviewMedia?.setOnClickListener {
+        chooseMediaButton?.setOnClickListener {
+            chooseMediaButton?.showProgress()
             requestFileAccess()
         }
     }
@@ -101,7 +108,7 @@ open class AddReviewFragment : FileUploadingFragment() {
             .navigate(AddReviewFragmentDirections.actionAddReviewFragmentToReviewsListFragment())
     }
 
-    private fun getReviewFromInputs() = ReviewModel(
+    open fun getReviewFromInputs() = ReviewModel(
         location = locationTextView?.text.toString(),
         artist = artistTextView?.text.toString(),
         review = reviewText?.text.toString(),

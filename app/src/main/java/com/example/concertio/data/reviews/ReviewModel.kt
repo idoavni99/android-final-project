@@ -55,7 +55,8 @@ data class ReviewModel(
             review = review,
             reviewer_uid = reviewerUid,
             id = id,
-            media_type = mediaType
+            media_type = mediaType,
+            media_uri = mediaUri
         )
     }
 }
