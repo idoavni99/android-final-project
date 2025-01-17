@@ -16,13 +16,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.concertio.R
 import com.example.concertio.extensions.loadProfilePicture
-import com.example.concertio.ui.main.ReviewType
-import com.example.concertio.ui.main.ReviewsAdapter
-import com.example.concertio.ui.main.ReviewsViewModel
+import com.example.concertio.ui.main.listadapter.ReviewType
+import com.example.concertio.ui.main.listadapter.ReviewsAdapter
 import com.example.concertio.ui.main.UserProfileViewModel
 
 class UserProfileFragment : Fragment() {
     private val userProfileViewModel: UserProfileViewModel by activityViewModels()
+    private lateinit var reviewsList: RecyclerView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -40,6 +40,13 @@ class UserProfileFragment : Fragment() {
         setupFields(view)
         setupMyReviewsList(view)
         super.onViewCreated(view, savedInstanceState)
+    }
+
+    override fun onDestroyView() {
+        reviewsList.run {
+            (adapter as? ReviewsAdapter)?.onViewHidden(this)
+        }
+        super.onDestroyView()
     }
 
     private fun setupFields(view: View) {
@@ -69,14 +76,20 @@ class UserProfileFragment : Fragment() {
 
     private fun setupMyReviewsList(view: View) {
         userProfileViewModel.observeMyReviews().observe(viewLifecycleOwner) {
-            view.findViewById<RecyclerView>(R.id.myReviewsList)?.run {
-                adapter = ReviewsAdapter({
-                    findNavController().navigate(
-                        UserProfileFragmentDirections.actionUserProfileFragmentToEditReviewFragment(
-                            it.id
+            reviewsList = view.findViewById(R.id.myReviewsList)
+            reviewsList.run {
+                adapter = ReviewsAdapter(
+                    reviewType = ReviewType.USER,
+                    onDelete = {
+                        userProfileViewModel.deleteReviewById(it.id)
+                    },
+                    onEdit = {
+                        findNavController().navigate(
+                            UserProfileFragmentDirections.actionUserProfileFragmentToEditReviewFragment(
+                                it.id
+                            )
                         )
-                    )
-                }, ReviewType.USER).apply {
+                    }).apply {
                     updateReviews(it)
                 }
                 layoutManager = LinearLayoutManager(context)

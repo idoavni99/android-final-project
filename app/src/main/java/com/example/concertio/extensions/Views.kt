@@ -2,17 +2,17 @@ package com.example.concertio.extensions
 
 import android.content.Context
 import android.net.Uri
-import android.view.KeyEvent
 import android.widget.ImageView
-import android.widget.MediaController
-import android.widget.VideoView
 import androidx.core.view.isVisible
+import androidx.media3.common.MediaItem
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.ui.PlayerView
 import com.example.concertio.R
 
 fun initMedia(
     context: Context,
     imageView: ImageView?,
-    videoView: VideoView?,
+    videoView: PlayerView?,
     uri: Uri,
     mediaType: String
 ) {
@@ -22,26 +22,18 @@ fun initMedia(
         imageView?.loadReviewImage(
             context,
             uri,
-            R.drawable.front_page_logo
+            R.drawable.baseline_insert_photo_24
         )
     } else {
-        imageView?.isVisible = false
         videoView?.apply {
-            setVideoURI(uri)
-            seekTo(1)
-            MediaController(context).also {
-                it.setAnchorView(this)
-            }
+            player =
+                ExoPlayer.Builder(context).build()
+            player?.setMediaItem(MediaItem.fromUri(uri))
+            player?.repeatMode = ExoPlayer.REPEAT_MODE_ONE
+            player?.seekTo(0, 0L)
+            player?.prepare()
+            imageView?.isVisible = false
             isVisible = true
-            setOnPreparedListener {
-                requestFocus()
-                setOnClickListener {
-                    if (!isPlaying) start() else pause()
-                }
-                setOnCompletionListener {
-                    seekTo(1)
-                }
-            }
         }
     }
 }

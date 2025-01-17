@@ -11,9 +11,10 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.RatingBar
 import android.widget.Toast
-import android.widget.VideoView
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.activityViewModels
+import androidx.media3.ui.PlayerView
 import androidx.navigation.findNavController
 import com.example.concertio.R
 import com.example.concertio.ui.main.ReviewsViewModel
@@ -31,7 +32,7 @@ open class AddReviewFragment : FileUploadingFragment() {
     var mediaUri: Uri? = null
     protected val viewModel: ReviewsViewModel by activityViewModels()
     protected val reviewImage by lazy { view?.findViewById<ImageView>(R.id.review_image) }
-    protected val reviewVideo by lazy { view?.findViewById<VideoView>(R.id.review_video) }
+    protected val reviewVideo by lazy { view?.findViewById<PlayerView>(R.id.review_video) }
     protected val chooseMediaButton by lazy { view?.findViewById<MaterialButton>(R.id.choose_media) }
     protected val artistTextView by lazy { view?.findViewById<EditText>(R.id.review_artist) }
     protected val locationTextView by lazy { view?.findViewById<EditText>(R.id.review_location) }
@@ -47,9 +48,10 @@ open class AddReviewFragment : FileUploadingFragment() {
                     mediaUri = it
                     mediaType =
                         context?.run {
-                            val type = contentResolver?.getType(it)?.split("/")?.get(0)
-                            initMedia(this, reviewImage, reviewVideo, it, type!!)
-                            type
+                            contentResolver.getType(it)?.split("/")?.get(0)?.let { type ->
+                                initMedia(this, reviewImage, reviewVideo, it, type)
+                                type
+                            }
                         }
                 }
             }
@@ -83,6 +85,13 @@ open class AddReviewFragment : FileUploadingFragment() {
                     this.onReviewSaved(view)
                 },
                 onErrorUi = {
+                    saveButton?.stopProgress(
+                        ResourcesCompat.getDrawable(
+                            resources,
+                            R.drawable.baseline_file_upload_24,
+                            resources.newTheme()
+                        )
+                    )
                     Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
                 }
             )
@@ -114,7 +123,7 @@ open class AddReviewFragment : FileUploadingFragment() {
         review = reviewText?.text.toString(),
         reviewerUid = reviewerUid,
         id = UUID.randomUUID().toString(),
-        stars = reviewStars?.rating?.toLong() ?: 4,
+        stars = reviewStars?.rating,
         mediaType = mediaType,
     )
 }

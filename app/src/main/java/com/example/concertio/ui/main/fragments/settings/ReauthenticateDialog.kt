@@ -12,6 +12,7 @@ import com.google.android.material.button.MaterialButton
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ReauthenticateDialog(val onReauthenticated: () -> Unit, val onError: () -> Unit) :
     DialogFragment() {
@@ -28,12 +29,14 @@ class ReauthenticateDialog(val onReauthenticated: () -> Unit, val onError: () ->
                         view.findViewById<EditText>(R.id.reauthenticate_email)
                     val password =
                         view.findViewById<EditText>(R.id.reauthenticate_password)
-                    lifecycleScope.launch(Dispatchers.IO) {
+                    lifecycleScope.launch {
                         try {
-                            FirebaseAuth.getInstance().signInWithEmailAndPassword(
-                                email.text.toString(),
-                                password.text.toString()
-                            )
+                            withContext(Dispatchers.IO) {
+                                FirebaseAuth.getInstance().signInWithEmailAndPassword(
+                                    email.text.toString(),
+                                    password.text.toString()
+                                )
+                            }
                             onReauthenticated()
                             dialog?.dismiss()
                         } catch (e: Exception) {

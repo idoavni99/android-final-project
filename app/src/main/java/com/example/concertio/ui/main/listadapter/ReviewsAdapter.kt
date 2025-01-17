@@ -1,7 +1,8 @@
-package com.example.concertio.ui.main
+package com.example.concertio.ui.main.listadapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.example.concertio.R
@@ -16,12 +17,12 @@ enum class ReviewType {
 }
 
 class ReviewsAdapter(
-    private val onReviewClicked: ((ReviewModel) -> Unit)? = null,
+    private val onEdit: ((ReviewModel) -> Unit)? = null,
+    private val onDelete: ((ReviewModel) -> Unit)? = null,
     private val reviewType: ReviewType
 ) :
     RecyclerView.Adapter<ViewHolder>() {
-
-    private var reviews: List<ReviewWithReviewer> = emptyList()
+    private val reviewDiffer = AsyncListDiffer(this, ReviewsComparator())
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return when (reviewType) {
@@ -40,23 +41,40 @@ class ReviewsAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val currentReview = reviews[position]
+        val currentReview = reviewDiffer.currentList[position]
         when (holder) {
-            is ReviewViewHolder -> ReviewViewHolder.bind(holder, currentReview, onReviewClicked)
+            is ReviewViewHolder -> ReviewViewHolder.bind(holder, currentReview)
             is UserReviewViewHolder -> UserReviewViewHolder.bind(
                 holder,
                 currentReview,
-                onReviewClicked
+                onDeleteClick = onDelete,
+                onEditClick = onEdit
             )
         }
     }
 
+    override fun onViewDetachedFromWindow(holder: ViewHolder) {
+        when (holder) {
+            is ReviewViewHolder -> holder.video.player?.pause()
+            is UserReviewViewHolder -> holder.video.player?.pause()
+        }
+        super.onViewDetachedFromWindow(holder)
+    }
+
     fun updateReviews(newReviews: List<ReviewWithReviewer>) {
-        this.reviews = newReviews
-        notifyDataSetChanged();
+        reviewDiffer.submitList(newReviews)
+    }
+
+    fun onViewHidden(recyclerView: RecyclerView) {
+        this.reviewDiffer.currentList.forEachIndexed({ index, review ->
+            when (val holder = recyclerView.findViewHolderForAdapterPosition(index)) {
+                is ReviewViewHolder -> holder.video.player?.release()
+                is UserReviewViewHolder -> holder.video.player?.release()
+            }
+        })
     }
 
     override fun getItemCount(): Int {
-        return reviews.size
+        return reviewDiffer.currentList.size
     }
 }

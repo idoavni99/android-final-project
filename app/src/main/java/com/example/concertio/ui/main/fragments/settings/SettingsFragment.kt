@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isVisible
 import androidx.credentials.CredentialManager
@@ -116,7 +117,9 @@ class SettingsFragment : FileUploadingFragment() {
                 }
             } else {
                 activity?.let {
-                    val dialog = ReauthenticateDialog(::showSensitiveFields) {}
+                    val dialog = ReauthenticateDialog(::showSensitiveFields) {
+                        Toast.makeText(context,"Unexpected Error", Toast.LENGTH_SHORT).show()
+                    }
                     dialog.show(it.supportFragmentManager, "reauthenticate")
                 }
             }

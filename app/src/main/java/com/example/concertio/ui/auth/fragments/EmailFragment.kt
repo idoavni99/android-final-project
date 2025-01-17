@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.provider.ContactsContract.CommonDataKinds.Email
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,13 +28,13 @@ class EmailFragment : FileUploadingFragment() {
     private val emailField by lazy { view?.findViewById<EditText>(R.id.login_email_text) }
     private val passwordField by lazy { view?.findViewById<EditText>(R.id.signup_password) }
     private val displayNameField by lazy { view?.findViewById<EditText>(R.id.signup_displayName) }
-    private val profilePicture by lazy { view?.findViewById<ImageView>(R.id.signup_profile_picture) }
+    private val profilePictureOrLogo by lazy { view?.findViewById<ImageView>(R.id.logo_or_profile) }
     private val actionButton by lazy { view?.findViewById<MaterialButton>(R.id.signup_action_button) }
     private val selectMediaLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 result.data?.data?.let {
-                    profilePicture?.loadProfilePicture(
+                    profilePictureOrLogo?.loadProfilePicture(
                         requireContext(),
                         it,
                         R.drawable.empty_profile_picture
@@ -89,6 +90,9 @@ class EmailFragment : FileUploadingFragment() {
             if (email?.isNotEmpty() == true && password?.isNotEmpty() == true) {
                 authViewModel.signInWithEmailPassword(email, password, onFinishUi = {
                     toApp()
+                }, onErrorUi = {
+                    actionButton?.stopProgress()
+                    Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
                 })
             } else {
                 actionButton?.stopProgress()
@@ -100,8 +104,8 @@ class EmailFragment : FileUploadingFragment() {
     private fun initRegisterMode() {
         passwordField?.visibility = View.VISIBLE
         displayNameField?.visibility = View.VISIBLE
-        profilePicture?.visibility = View.VISIBLE
-        profilePicture?.setOnClickListener {
+        profilePictureOrLogo?.setImageResource(R.drawable.empty_profile_picture)
+        profilePictureOrLogo?.setOnClickListener {
             requestFileAccess()
         }
         actionButton?.text = "Sign Up"
@@ -110,20 +114,22 @@ class EmailFragment : FileUploadingFragment() {
             val email = emailField?.text?.toString()
             val password = passwordField?.text?.toString()
             val displayName = displayNameField?.text?.toString()
-
-            if (email?.isNotEmpty() == true && password?.isNotEmpty() == true && password.length > 6 && displayName?.isNotEmpty() == true) {
+            try {
+                require(password?.isNotEmpty() == true && password.length > 6) { "Password must be 6 letters or longer" }
+                require(email?.isNotEmpty() == true) { "Email must be defined" }
+                require(displayName?.isNotEmpty() == true) { "Full Name must be defined" }
                 authViewModel.signUpWithEmailPassword(
-                    email,
-                    password,
-                    displayName,
+                    email!!,
+                    password!!,
+                    displayName!!,
                     profilePictureUri,
                     onFinishUi = {
                         toApp()
                     })
-            } else {
+            } catch (e: Exception) {
                 Toast.makeText(
                     requireContext(),
-                    "Password needs 6 or more letters",
+                    e.message,
                     Toast.LENGTH_SHORT
                 ).show()
                 actionButton?.stopProgress()

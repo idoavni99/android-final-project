@@ -6,6 +6,7 @@ import android.widget.ImageView
 import android.widget.RatingBar
 import android.widget.TextView
 import android.widget.VideoView
+import androidx.media3.ui.PlayerView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.concertio.R
 import com.example.concertio.data.reviews.ReviewModel
@@ -19,7 +20,7 @@ class ReviewViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     val artist: TextView = itemView.findViewById(R.id.review_artist)
     val text: TextView = itemView.findViewById(R.id.review_text)
     val image: ImageView = itemView.findViewById(R.id.review_image)
-    val video: VideoView = itemView.findViewById(R.id.review_video)
+    val video: PlayerView = itemView.findViewById(R.id.review_video)
     val profileImage: ImageView = itemView.findViewById(R.id.reviewer_image)
     val stars: RatingBar = itemView.findViewById(R.id.review_stars)
 
@@ -27,7 +28,6 @@ class ReviewViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(
             holder: ReviewViewHolder,
             currentReview: ReviewWithReviewer,
-            onReviewClicked: ((ReviewModel) -> Unit)?
         ) {
             holder.reviewerUid.text = currentReview.reviewer.name
             holder.location.text = currentReview.review.location
@@ -40,19 +40,18 @@ class ReviewViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
                     R.drawable.empty_profile_picture
                 )
             }
-            currentReview.review.mediaUri?.let {
-                initMedia(
-                    holder.itemView.context,
-                    holder.image,
-                    holder.video,
-                    Uri.parse(it),
-                    currentReview.review.mediaType!!
-                )
+            currentReview.review.mediaUri?.let { uri ->
+                currentReview.review.mediaType?.let { type ->
+                    initMedia(
+                        holder.itemView.context,
+                        holder.image,
+                        holder.video,
+                        Uri.parse(uri),
+                        type
+                    )
+                }
             }
-            holder.stars.rating = currentReview.review.stars.toFloat()
-            holder.itemView.setOnClickListener {
-                onReviewClicked?.invoke(currentReview.review)
-            }
+            holder.stars.rating = currentReview.review.stars ?: 0F
         }
     }
 }

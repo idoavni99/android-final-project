@@ -19,12 +19,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <VideoView
+    <androidx.media3.ui.PlayerView
         android:id="@+id/review_video"
         android:layout_width="360dp"
         android:layout_height="360dp"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:resize_mode="fill" />
 </androidx.constraintlayout.widget.ConstraintLayout>

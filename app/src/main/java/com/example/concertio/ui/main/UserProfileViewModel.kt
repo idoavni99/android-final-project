@@ -23,6 +23,10 @@ class UserProfileViewModel : ViewModel() {
 
     fun observeMyReviews() = reviewsRepository.getReviewsList(50, 0, true)
 
+    fun deleteReviewById(id: String) = viewModelScope.launch {
+        reviewsRepository.deleteReviewById(id)
+    }
+
     fun signOut() = viewModelScope.launch {
         reviewsRepository.deleteAll()
         usersRepository.deleteAllUsers()

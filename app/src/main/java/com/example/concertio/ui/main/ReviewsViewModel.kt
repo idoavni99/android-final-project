@@ -49,7 +49,11 @@ class ReviewsViewModel : ViewModel() {
         review.validate().let {
             viewModelScope.launch(Dispatchers.Main) {
                 if (it.success) {
-                    val uri = if(mediaUri == null || mediaUri.scheme != "https") mediaUri else repository.uploadReviewMedia(review.id, mediaUri)
+                    val uri =
+                        if (mediaUri?.scheme == "content") repository.uploadReviewMedia(
+                            review.id,
+                            mediaUri
+                        ) else mediaUri
                     repository.saveReview(
                         review.copy(
                             mediaUri = uri.toString()

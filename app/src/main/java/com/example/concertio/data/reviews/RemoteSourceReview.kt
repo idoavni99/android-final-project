@@ -13,7 +13,7 @@ data class RemoteSourceReview(
     val media_uri: String? = null,
     val id: String? = null,
     val updated_at: Long = System.currentTimeMillis(),
-    val stars: Long = 4
+    val stars: Float = 4F
 ) {
     fun toReviewModel(): ReviewModel {
         return ReviewModel(

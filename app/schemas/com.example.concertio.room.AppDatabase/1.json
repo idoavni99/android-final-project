@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "96eaf0874c47a44617a6d38faa9a9029",
+    "identityHash": "f4ad6f858cd91acaf793392e133db159",
     "entities": [
       {
         "tableName": "reviews",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `location` TEXT, `reviewer_uid` TEXT NOT NULL, `artist` TEXT, `review` TEXT NOT NULL, `updated_at` INTEGER NOT NULL DEFAULT 0, `stars` INTEGER NOT NULL DEFAULT 4, `media_type` TEXT, `media_uri` TEXT, PRIMARY KEY(`id`), FOREIGN KEY(`reviewer_uid`) REFERENCES `users`(`uid`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `location` TEXT, `reviewer_uid` TEXT NOT NULL, `artist` TEXT, `review` TEXT NOT NULL, `updated_at` INTEGER NOT NULL DEFAULT 0, `stars` REAL DEFAULT 4, `media_type` TEXT, `media_uri` TEXT, PRIMARY KEY(`id`), FOREIGN KEY(`reviewer_uid`) REFERENCES `users`(`uid`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
         "fields": [
           {
             "fieldPath": "id",
@@ -48,8 +48,8 @@
           {
             "fieldPath": "stars",
             "columnName": "stars",
-            "affinity": "INTEGER",
-            "notNull": true,
+            "affinity": "REAL",
+            "notNull": false,
             "defaultValue": "4"
           },
           {
@@ -128,7 +128,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '96eaf0874c47a44617a6d38faa9a9029')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f4ad6f858cd91acaf793392e133db159')"
     ]
   }
 }

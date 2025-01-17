@@ -41,8 +41,8 @@ class MainActivity : AppCompatActivity() {
                 return@observe finish()
             }
 
+            bottomNav.itemIconTintList = null
             myProfileData.profilePicture?.let {
-                bottomNav.itemIconTintList = null
                 bottomNav.menu.findItem(R.id.userProfileFragment).apply {
                     loadImage(
                         applicationContext,

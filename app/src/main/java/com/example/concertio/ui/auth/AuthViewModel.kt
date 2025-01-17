@@ -22,7 +22,7 @@ import kotlinx.coroutines.withContext
 
 class AuthViewModel : ViewModel() {
     private val usersRepository = UsersRepository.getInstance()
-    fun register(onFinishUi: () -> Unit) {
+    private fun register(onFinishUi: () -> Unit) {
         viewModelScope.launch(Dispatchers.Main) {
             FirebaseAuth.getInstance().currentUser?.let {
                 usersRepository.upsertUser(
@@ -52,6 +52,7 @@ class AuthViewModel : ViewModel() {
         email: String,
         password: String,
         onFinishUi: () -> Unit,
+        onErrorUi: (message: String) -> Unit
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -60,7 +61,9 @@ class AuthViewModel : ViewModel() {
                         register(onFinishUi)
                     }
             } catch (e: Exception) {
-                Log.e("AuthViewModel", "signInWithEmailPassword: ${e.message} ${e::class.java}")
+                withContext(Dispatchers.Main) {
+                    onErrorUi("Sign in failed")
+                }
             }
         }
     }
@@ -74,11 +77,13 @@ class AuthViewModel : ViewModel() {
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
-                .await().user?.updateProfile(
-                    UserProfileChangeRequest.Builder().setDisplayName(displayName)
-                        .setPhotoUri(profilePictureUri).build()
-                )
-            register(onFinishUi)
+                .await().apply {
+                    user?.updateProfile(
+                        UserProfileChangeRequest.Builder().setDisplayName(displayName)
+                            .setPhotoUri(profilePictureUri).build()
+                    )
+                }
+            signInWithEmailPassword(email, password, onFinishUi, onErrorUi = {})
         }
     }
 

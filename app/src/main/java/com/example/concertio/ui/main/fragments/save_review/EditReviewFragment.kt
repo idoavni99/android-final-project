@@ -29,7 +29,7 @@ class EditReviewFragment : AddReviewFragment() {
     override fun setupView(view: View) {
         super.setupView(view)
         view.findViewById<MaterialButton>(R.id.upload_review_button)?.apply {
-            text = "Save Changes"
+            text = resources.getText(R.string.save_changes)
             icon = null
         }
         viewModel.getReviewById(args.reviewId).observe(viewLifecycleOwner, ::setupInputFields)
@@ -40,13 +40,14 @@ class EditReviewFragment : AddReviewFragment() {
             artistTextView?.setText(artist)
             locationTextView?.setText(location)
             reviewText?.setText(review)
-            reviewStars?.rating = stars.toFloat()
-            this@EditReviewFragment.reviewerUid = reviewerUid
-            mediaUri?.let {
-                val parsedUri = Uri.parse(it)
-                this@EditReviewFragment.mediaUri = parsedUri
-                this@EditReviewFragment.mediaType = mediaType
-                initMedia(requireContext(), reviewImage, reviewVideo, parsedUri, mediaType!!)
+            reviewStars?.rating = stars ?: 0F
+            mediaUri?.let { uri ->
+                mediaType?.let { type ->
+                    val parsedUri = Uri.parse(uri)
+                    this@EditReviewFragment.mediaUri = parsedUri
+                    this@EditReviewFragment.mediaType = mediaType
+                    initMedia(requireContext(), reviewImage, reviewVideo, parsedUri, type)
+                }
             }
         } ?: {
             viewModel.invalidateReviewById(args.reviewId)

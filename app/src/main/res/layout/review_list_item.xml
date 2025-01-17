@@ -21,8 +21,21 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:text="@string/reviewer_name_placeholder"
-        android:textSize="32sp"
+        android:textSize="24sp"
         app:layout_constraintStart_toEndOf="@id/reviewer_image"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <RatingBar
+        android:id="@+id/review_stars"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:isIndicator="true"
+        android:scaleX="0.5"
+        android:scaleY="0.5"
+        android:transformPivotX="0dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintStart_toEndOf="@id/reviewer"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
@@ -41,9 +54,9 @@
         android:layout_height="wrap_content"
         android:text="@string/review_location_placeholder"
         android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="@id/review_location_icon"
         app:layout_constraintStart_toEndOf="@id/review_location_icon"
-        app:layout_constraintTop_toBottomOf="@id/reviewer"
-        app:layout_constraintBottom_toBottomOf="@id/review_location_icon"/>
+        app:layout_constraintTop_toBottomOf="@id/reviewer" />
 
     <ImageView
         android:id="@+id/review_artist_icon"
@@ -59,8 +72,8 @@
         android:layout_height="wrap_content"
         android:text="@string/review_artist_placeholder"
         android:textSize="16sp"
-        app:layout_constraintStart_toEndOf="@id/review_location"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/review_location"
         app:layout_constraintTop_toTopOf="@id/review_location" />
 
     <include
@@ -68,30 +81,19 @@
         layout="@layout/review_media_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
+        android:layout_margin="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/reviewer_image" />
-
-    <RatingBar
-        android:id="@+id/review_stars"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:isIndicator="true"
-        android:scaleX="0.5"
-        android:scaleY="0.5"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/review_media" />
 
     <TextView
         android:id="@+id/review_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
         android:text="Review Text"
         android:textSize="36sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/review_stars" />
+        app:layout_constraintTop_toBottomOf="@id/review_media" />
 </androidx.constraintlayout.widget.ConstraintLayout>
