@@ -10,6 +10,5 @@
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/auth_fragment_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:navGraph="@navigation/app_navigation" />
+        android:layout_height="match_parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

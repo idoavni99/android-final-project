@@ -1,6 +1,8 @@
 package com.example.concertio.extensions
 
+import android.graphics.drawable.Drawable
 import androidx.annotation.ColorInt
+import androidx.annotation.DrawableRes
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.progressindicator.CircularProgressIndicatorSpec
 import com.google.android.material.progressindicator.IndeterminateDrawable
@@ -20,7 +22,7 @@ fun MaterialButton.showProgress(@ColorInt tintColor: Int = this.iconTint.default
     this.isClickable = false
 }
 
-fun MaterialButton.stopProgress() {
-    this.icon = null
+fun MaterialButton.stopProgress(icon: Drawable? = null) {
+    this.icon = icon
     this.isClickable = true
 }

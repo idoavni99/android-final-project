@@ -6,7 +6,6 @@ import java.sql.Timestamp
 
 data class RemoteSourceReview(
     val artist: String? = null,
-    val location_coordinate: GeoPoint? = null,
     val location_name: String? = null,
     val review: String? = null,
     val reviewer_uid: String? = null,
@@ -14,7 +13,7 @@ data class RemoteSourceReview(
     val media_uri: String? = null,
     val id: String? = null,
     val updated_at: Long = System.currentTimeMillis(),
-    val stars: Long = 4
+    val stars: Float = 4F
 ) {
     fun toReviewModel(): ReviewModel {
         return ReviewModel(

@@ -12,8 +12,16 @@ import android.view.View
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 fun ImageView.loadProfilePicture(context: Context, uri: Uri, placeholderRes: Int) {
     Glide.with(context)
@@ -30,13 +38,17 @@ fun ImageView.loadReviewImage(context: Context, uri: Uri, placeholderRes: Int) {
         .into(this)
 }
 
-fun MenuItem.loadImage(context: Context, uri: Uri, placeholderRes: Int) {
+fun MenuItem.loadImage(
+    context: Context,
+    uri: Uri,
+    placeholderRes: Int,
+    scope: CoroutineScope
+) {
     loadImageIntoDrawable(context, uri, placeholderRes) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            iconTintList = null
-            iconTintMode = null
+        scope.launch(Dispatchers.Main) {
+            icon = it
+            icon?.setTint(context.getColor(com.google.android.material.R.color.design_default_color_secondary))
         }
-        icon = it
     }
 }
 
@@ -46,17 +58,32 @@ fun loadImageIntoDrawable(
     placeholderRes: Int,
     onDrawableLoaded: (drawable: Drawable) -> Unit
 ) {
-    Glide.with(context).asBitmap()
+    Glide.with(context)
+        .asBitmap()
         .load(uri)
-        .circleCrop().placeholder(placeholderRes)
-        .into(object : CustomTarget<Bitmap>(32, 32) {
-            override fun onResourceReady(
-                resource: Bitmap,
-                transition: Transition<in Bitmap>?
-            ) {
-                onDrawableLoaded(BitmapDrawable(context.resources, resource))
+        .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+        .placeholder(placeholderRes)
+        .circleCrop()
+        .listener(object : RequestListener<Bitmap> {
+            override fun onLoadFailed(
+                e: GlideException?,
+                model: Any?,
+                target: Target<Bitmap>,
+                isFirstResource: Boolean
+            ): Boolean {
+                return false
             }
 
-            override fun onLoadCleared(placeholder: Drawable?) {}
-        })
+            override fun onResourceReady(
+                resource: Bitmap,
+                model: Any,
+                target: Target<Bitmap>?,
+                dataSource: DataSource,
+                isFirstResource: Boolean
+            ): Boolean {
+                onDrawableLoaded(BitmapDrawable(context.resources, resource))
+                return false
+            }
+
+        }).submit()
 }

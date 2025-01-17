@@ -1,7 +1,6 @@
 package com.example.concertio.data.users
 
 import android.net.Uri
-import androidx.core.net.toUri
 import com.example.concertio.room.DatabaseHolder
 import com.example.concertio.storage.CloudStorageHolder
 import com.google.firebase.auth.FirebaseAuth
@@ -11,8 +10,7 @@ import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
-import java.io.File
-import java.net.URL
+
 
 class UsersRepository {
     private val usersDao = DatabaseHolder.getDatabase().usersDao()
@@ -27,16 +25,31 @@ class UsersRepository {
         usersDao.upsertAll(user)
     }
 
-    suspend fun updateUserDetails(user: UserModel, password: String) = withContext(Dispatchers.IO) {
+    suspend fun updateUserDetails(name: String, photoUri: Uri) = withContext(Dispatchers.IO) {
         FirebaseAuth.getInstance().currentUser?.run {
             updateProfile(
-                UserProfileChangeRequest.Builder().setDisplayName(user.name).build()
+                UserProfileChangeRequest.Builder().apply {
+                    displayName = name
+                    setPhotoUri(photoUri)
+                }.build()
             ).await()
-            verifyBeforeUpdateEmail(user.email!!).await()
-            if (password.isNotEmpty()) {
-                updatePassword(password).await()
-            }
-            upsertUser(user)
+            upsertUser(
+                UserModel(
+                    uid = uid,
+                    name = name,
+                    profilePicture = photoUri.toString(),
+                    email = email
+                )
+            )
+        }
+    }
+
+    suspend fun updateUserAuth(email: String?, password: String?) = withContext(Dispatchers.IO) {
+        email?.let {
+            FirebaseAuth.getInstance().currentUser?.verifyBeforeUpdateEmail(email)?.await()
+        }
+        password?.let {
+            FirebaseAuth.getInstance().currentUser?.updatePassword(password)?.await()
         }
     }
 
@@ -60,6 +73,10 @@ class UsersRepository {
 
     suspend fun getUserByUid(uid: String) = withContext(Dispatchers.IO) {
         usersDao.getUserByUid(uid)
+    }
+
+    suspend fun isUserExisting(email: String) = withContext(Dispatchers.IO) {
+        firestoreHandle.whereEqualTo("email", email).get().await().size() > 0
     }
 
     suspend fun getUserFromRemoteSource(uid: String): UserModel? =
@@ -92,7 +109,12 @@ class UsersRepository {
             try {
                 CloudStorageHolder.profilePictures.child("$uid-profile.png")
                     .putFile(uri).await()
-                CloudStorageHolder.profilePictures.child("$uid-profile.png").downloadUrl.await()
+                val photoUri =
+                    CloudStorageHolder.profilePictures.child("$uid-profile.png").downloadUrl.await()
+                FirebaseAuth.getInstance().currentUser?.updateProfile(
+                    UserProfileChangeRequest.Builder().setPhotoUri(photoUri).build()
+                )?.await()
+                photoUri
             } catch (error: Error) {
                 null
             }

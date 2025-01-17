@@ -40,12 +40,11 @@ class ReviewsRepository {
         offset: Int,
         getMyReviews: Boolean = false
     ): LiveData<List<ReviewWithReviewer>> {
-        val myUid = usersRepository.getMyUid()
         return if (getMyReviews) reviewsDao.getAllMyReviewsPaginated(
             limit,
             offset,
-            myUid
-        ) else reviewsDao.getAllOtherPeopleReviewsPaginated(limit, offset, myUid)
+            usersRepository.getMyUid()
+        ) else reviewsDao.getAllReviewsPaginated(limit, offset)
     }
 
 

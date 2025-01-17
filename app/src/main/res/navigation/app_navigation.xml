@@ -17,24 +17,10 @@
         android:label="Reviews List"
         tools:layout="@layout/fragment_reviews_list">
         <action
-            android:id="@+id/action_reviewsListFragment_to_reviewDetailsFragment"
-            app:destination="@id/reviewDetailsFragment" />
-        <action
             android:id="@+id/action_reviewsListFragment_to_addReviewFragment"
             app:destination="@id/addReviewFragment" />
     </fragment>
-    <fragment
-        android:id="@+id/reviewDetailsFragment"
-        android:name="com.example.concertio.ui.main.fragments.review_details.ReviewDetailsFragment"
-        android:label="Review Details"
-        tools:layout="@layout/fragment_review_details">
-        <action
-            android:id="@+id/action_reviewDetailsFragment_to_reviewsListFragment"
-            app:destination="@id/reviewsListFragment" />
-        <argument
-            android:name="reviewId"
-            app:argType="string" />
-    </fragment>
+
     <fragment
         android:id="@+id/editReviewFragment"
         android:name="com.example.concertio.ui.main.fragments.save_review.EditReviewFragment"
@@ -65,14 +51,14 @@
             android:id="@+id/action_userProfileFragment_to_editReviewFragment"
             app:destination="@id/editReviewFragment" />
         <action
-            android:id="@+id/action_userProfileFragment_to_editProfileFragment"
-            app:destination="@+id/editProfileFragment" />
+            android:id="@+id/action_userProfileFragment_to_settingsFragment"
+            app:destination="@+id/settingsFragment" />
     </fragment>
 
     <fragment
-        android:id="@+id/editProfileFragment"
-        android:name="com.example.concertio.ui.main.fragments.edit_profile.EditProfileFragment"
-        tools:layout="@layout/fragment_edit_profile">
+        android:id="@+id/settingsFragment"
+        android:name="com.example.concertio.ui.main.fragments.settings.SettingsFragment"
+        tools:layout="@layout/fragment_settings">
         <action
             android:id="@+id/action_editProfileFragment_to_userProfileFragment"
             app:destination="@id/userProfileFragment" />

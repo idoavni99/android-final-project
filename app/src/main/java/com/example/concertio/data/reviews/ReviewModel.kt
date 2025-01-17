@@ -31,7 +31,7 @@ data class ReviewModel(
     @ColumnInfo(
         name = "stars",
         defaultValue = "4"
-    ) val stars: Long = 4,
+    ) val stars: Float?,
     @ColumnInfo(
         name = "media_type",
     ) val mediaType: String? = null,
@@ -42,6 +42,8 @@ data class ReviewModel(
     fun validate(): ValidationResult {
         try {
             require(review.isNotEmpty()) { "Review cannot be empty" }
+            require(stars != null && stars in 0F..5F) { "Stars must be between 0 and 5" }
+            require(location?.isNotEmpty() == true || artist?.isNotEmpty() == true) { "Must have location or artist" }
             return ValidationResult()
         } catch (e: IllegalArgumentException) {
             return ValidationResult(e)
@@ -55,7 +57,10 @@ data class ReviewModel(
             review = review,
             reviewer_uid = reviewerUid,
             id = id,
-            media_type = mediaType
+            media_type = mediaType,
+            media_uri = mediaUri,
+            stars = stars ?: 0F,
+            updated_at = updatedAt,
         )
     }
 }
