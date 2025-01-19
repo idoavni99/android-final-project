@@ -11,6 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
+        app:tint="?attr/colorPrimaryVariant"
         android:src="@drawable/baseline_edit_location_24"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -94,11 +95,11 @@
         android:id="@+id/review_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
         android:text="@string/review_text_placeholder"
         android:textSize="36sp"
+        android:paddingHorizontal="32dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@id/review_media"
         app:layout_constraintTop_toBottomOf="@id/review_media" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
